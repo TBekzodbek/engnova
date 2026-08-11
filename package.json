@@ -11,6 +11,7 @@
     "sync:android": "node scripts/apply-android-overrides.mjs",
     "cap:android": "npm run build && npx cap sync android && npm run sync:android",
     "keystore:generate": "node scripts/generate-upload-keystore.mjs",
+    "icon:export": "node scripts/export-play-icon.mjs",
     "build:apk:debug": "npm run cap:android && cd android && gradlew.bat assembleDebug",
     "build:apk:release": "npm run cap:android && cd android && gradlew.bat assembleRelease",
     "build:aab": "npm run cap:android && cd android && gradlew.bat bundleRelease"

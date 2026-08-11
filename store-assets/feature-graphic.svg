@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500" role="img" aria-label="Engnova — English, one app">
+  <!--
+    Engnova — Google Play feature graphic (1024x500, no alpha in raster).
+    Composition:
+      Left ~60%  : wordmark "Engnova" + tagline "English, one app" + UZ/RU/EN chips + byline
+      Right ~40% : Northstar Neon mark (star + halo + bloom + spark rays) at ~280x280
+      Background : #08080C base + upper-left indigo bloom for warmth behind copy
+    Star geometry is scaled from assets/brand/icon-full.svg (Ro=145 -> 140, Ri=58 -> 56,
+    inner point offset 41.01 -> 39.60), re-centered on (820, 250) inside this canvas.
+  -->
+  <defs>
+    <!-- Base background: near-black with a whisper of tone -->
+    <linearGradient id="fg-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   stop-color="#0A0A16"/>
+      <stop offset="0.6" stop-color="#08080C"/>
+      <stop offset="1"   stop-color="#05050E"/>
+    </linearGradient>
+
+    <!-- Upper-left indigo bloom sitting behind the wordmark -->
+    <radialGradient id="fg-bloom-left" cx="0.18" cy="0.10" r="0.75">
+      <stop offset="0"    stop-color="#554BE7" stop-opacity="0.28"/>
+      <stop offset="0.35" stop-color="#554BE7" stop-opacity="0.14"/>
+      <stop offset="1"    stop-color="#554BE7" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Star-side bloom: wider indigo aura underneath the mark -->
+    <radialGradient id="fg-bloom-star" cx="0.80" cy="0.50" r="0.42">
+      <stop offset="0"   stop-color="#554BE7" stop-opacity="0.55"/>
+      <stop offset="0.4" stop-color="#554BE7" stop-opacity="0.18"/>
+      <stop offset="1"   stop-color="#554BE7" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Chromatic halo behind the star (white core -> indigo -> cyan -> transparent) -->
+    <radialGradient id="fg-halo" cx="0.80" cy="0.50" r="0.22">
+      <stop offset="0"    stop-color="#F5F8FF" stop-opacity="0.95"/>
+      <stop offset="0.12" stop-color="#C7C8FF" stop-opacity="0.80"/>
+      <stop offset="0.32" stop-color="#7B72EE" stop-opacity="0.50"/>
+      <stop offset="0.60" stop-color="#4136C4" stop-opacity="0.28"/>
+      <stop offset="0.88" stop-color="#1EA8FF" stop-opacity="0.10"/>
+      <stop offset="1"    stop-color="#1EA8FF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Star face: near-white with a tiny cool tint -->
+    <linearGradient id="fg-star" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0"   stop-color="#FFFFFF"/>
+      <stop offset="0.7" stop-color="#E9ECFF"/>
+      <stop offset="1"   stop-color="#C7D6FF"/>
+    </linearGradient>
+
+    <!-- Hot spot at the star's exact center -->
+    <radialGradient id="fg-hotspot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0"   stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="1"   stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 1. Base background — full-bleed rectangle (no alpha; Play forbids transparency) -->
+  <rect x="0" y="0" width="1024" height="500" fill="url(#fg-bg)"/>
+
+  <!-- 2. Upper-left indigo bloom for warmth behind the copy -->
+  <rect x="0" y="0" width="1024" height="500" fill="url(#fg-bloom-left)"/>
+
+  <!-- 3. Star-side bloom (wide, soft) — behind halo/rays -->
+  <rect x="0" y="0" width="1024" height="500" fill="url(#fg-bloom-star)"/>
+
+  <!-- 4. Chromatic halo disc centered on the star -->
+  <rect x="0" y="0" width="1024" height="500" fill="url(#fg-halo)"/>
+
+  <!-- 5. Spark rays — two diagonals cutting through the halo -->
+  <g stroke="#FFFFFF" stroke-linecap="round">
+    <line x1="686" y1="116" x2="954" y2="384" stroke-width="1.6" opacity="0.32"/>
+    <line x1="954" y1="116" x2="686" y2="384" stroke-width="1.6" opacity="0.32"/>
+  </g>
+
+  <!-- 6. Star — 4-point directional, centered on (820, 250), Ro=140, Ri=56 -->
+  <!-- Faint outer glow ring -->
+  <path
+    d="M 820 110 L 859.60 210.40 L 960 250 L 859.60 289.60 L 820 390 L 780.40 289.60 L 680 250 L 780.40 210.40 Z"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="6"
+    stroke-linejoin="round"
+    opacity="0.15"/>
+
+  <path
+    d="M 820 110 L 859.60 210.40 L 960 250 L 859.60 289.60 L 820 390 L 780.40 289.60 L 680 250 L 780.40 210.40 Z"
+    fill="url(#fg-star)"
+    stroke="#FFFFFF"
+    stroke-width="1.5"
+    stroke-linejoin="round"/>
+
+  <!-- 7. Hot spot at the star's exact center — the neon "electron" -->
+  <circle cx="820" cy="250" r="26" fill="url(#fg-hotspot)"/>
+  <!-- Tiny high-contrast core dot for crispness -->
+  <circle cx="820" cy="250" r="4" fill="#FFFFFF"/>
+
+  <!-- 8. Wordmark "Engnova" — large, SemiBold, ink color -->
+  <text
+    x="72" y="238"
+    font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Arial, sans-serif"
+    font-size="86"
+    font-weight="600"
+    letter-spacing="-2.5"
+    fill="#EDEFF6">Engnova</text>
+
+  <!-- 9. Tagline — Medium, muted -->
+  <text
+    x="74" y="284"
+    font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Arial, sans-serif"
+    font-size="24"
+    font-weight="500"
+    letter-spacing="0.2"
+    fill="#EDEFF6"
+    fill-opacity="0.65">English, one app</text>
+
+  <!-- 10. Language chip row — UZ / RU / EN, hints multi-language support -->
+  <g font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Arial, sans-serif"
+     font-size="12"
+     font-weight="600"
+     letter-spacing="1.4">
+    <!-- UZ (accent-tinted, default UI language) -->
+    <rect x="74"  y="322" width="44" height="24" rx="12" ry="12"
+          fill="#554BE7" fill-opacity="0.18"
+          stroke="#554BE7" stroke-opacity="0.55" stroke-width="1"/>
+    <text x="96"  y="338" text-anchor="middle" fill="#C7C8FF">UZ</text>
+
+    <!-- RU -->
+    <rect x="126" y="322" width="44" height="24" rx="12" ry="12"
+          fill="#FFFFFF" fill-opacity="0.05"
+          stroke="#FFFFFF" stroke-opacity="0.20" stroke-width="1"/>
+    <text x="148" y="338" text-anchor="middle" fill="#9AA0B1">RU</text>
+
+    <!-- EN -->
+    <rect x="178" y="322" width="44" height="24" rx="12" ry="12"
+          fill="#FFFFFF" fill-opacity="0.05"
+          stroke="#FFFFFF" stroke-opacity="0.20" stroke-width="1"/>
+    <text x="200" y="338" text-anchor="middle" fill="#9AA0B1">EN</text>
+  </g>
+
+  <!-- 11. Bottom-left byline — subtle, product domains -->
+  <text
+    x="74" y="458"
+    font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Arial, sans-serif"
+    font-size="14"
+    font-weight="500"
+    letter-spacing="0.6"
+    fill="#EDEFF6"
+    fill-opacity="0.40">cefracademy.uz  ·  ieltslevel.uz</text>
+</svg>
