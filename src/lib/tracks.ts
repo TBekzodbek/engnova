@@ -22,11 +22,25 @@ export interface TrackDef {
      *  never as an in-app purchase (Google Play billing-policy compliance). */
     activateUrl: string;
     /**
-     * URL fragments that must NEVER open inside the app webview
-     * (pricing / checkout / payment gateways). A hit is bounced to the system
-     * browser. NOTE: substring matching is a v1 heuristic — tickets 10+11
-     * migrate this to a proper allowedHosts + paymentHosts allowlist inside
-     * the custom WebView plugin.
+     * Hosts (bare or subdomain-parent) whose pages LOAD inside the app webview.
+     * Anything not on this list is routed to the system browser by the native
+     * plugin (WebViewClient.shouldOverrideUrlLoading — see EngnovaWebViewPlugin).
+     * Match is exact OR endsWith(".<host>"), so "cefracademy.uz" matches both
+     * `cefracademy.uz` and `www.cefracademy.uz`, but not `evil-cefracademy.uz`.
+     */
+    allowedHosts: string[];
+    /**
+     * Payment/checkout hosts. A hit here is bounced OUT to a Chrome Custom Tab
+     * (shared cookie jar, warm-up capable) — payment NEVER renders inside the
+     * app, per Google Play's billing-policy compliance rule. Same match rules
+     * as allowedHosts.
+     */
+    paymentHosts: string[];
+    /**
+     * DEPRECATED (kept for backwards-compat with any surface still reading it).
+     * URL fragments that must NEVER open inside the app webview. Superseded
+     * by the allowedHosts + paymentHosts allowlist above; will be dropped once
+     * every caller migrates.
      */
     blockedPatterns: string[];
     /** CSS custom-property names for this track's shell tints (defined in globals.css). */
@@ -49,6 +63,8 @@ export const TRACKS: Record<Track, TrackDef> = {
         id: 'cefr',
         url: 'https://cefracademy.uz',
         activateUrl: 'https://cefracademy.uz',
+        allowedHosts: ['cefracademy.uz', 'supabase.co', 'googleusercontent.com'],
+        paymentHosts: ['paycom.uz', 'checkout.paycom.uz', 'click.uz', 'my.click.uz'],
         blockedPatterns: ['/pricing', 'paycom', 'click.uz'],
         tint: {
             shell:     'var(--track-cefr-shell)',
@@ -66,6 +82,12 @@ export const TRACKS: Record<Track, TrackDef> = {
         id: 'ielts',
         url: 'https://ieltslevel.uz',
         activateUrl: 'https://ieltslevel.uz',
+        allowedHosts: ['ieltslevel.uz', 'supabase.co', 'vercel.app'],
+        paymentHosts: [
+            'paycom.uz', 'checkout.paycom.uz',
+            'click.uz', 'my.click.uz',
+            'stripe.com', 'checkout.stripe.com', 'js.stripe.com',
+        ],
         blockedPatterns: ['/pricing', 'stripe.com', 'paycom', 'click.uz'],
         tint: {
             shell:     'var(--track-ielts-shell)',

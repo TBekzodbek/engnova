@@ -35,12 +35,20 @@ export default function ProductScreen({ track, onSwitchTrack }: { track: Track; 
     const [native] = useState(isNative);
     const [phase, setPhase] = useState<Phase>(native ? 'loading' : 'webPreview');
     const [confirmingSwitch, setConfirmingSwitch] = useState(false);
-    const cleanupRef = useRef<null | (() => void)>(null);
+    const cleanupRef = useRef<null | (() => Promise<void>)>(null);
     const slowTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
     const failTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [reloadKey, setReloadKey] = useState(0);
 
-    // ── Open the webview + set up progressive fallbacks ─────────────────────
+    // ── Open the webview + wire real events + progressive fallbacks ────────
+    // Plugin fires:
+    //   'progress' 0..100     — dismiss loading state at ≥85 (first paint is
+    //                            close enough that the fade-out feels honest)
+    //   'error'   main-frame  — jump straight to error phase, clear timers
+    //   'urlBlocked'          — a payment host was intercepted and handed to
+    //                            Chrome Custom Tabs; no UI change, informative
+    // The 10-second failsafe timer is still armed in case the plugin never
+    // reports anything (e.g. the page hangs before any onProgressChanged fires).
     useEffect(() => {
         if (!native) return;
         let disposed = false;
@@ -48,16 +56,38 @@ export default function ProductScreen({ track, onSwitchTrack }: { track: Track; 
         slowTimer.current = setTimeout(() => { if (!disposed) setPhase(p => p === 'loading' ? 'slow' : p); }, SLOW_MS);
         failTimer.current = setTimeout(() => { if (!disposed) setPhase(p => (p === 'loading' || p === 'slow') ? 'error' : p); }, TIMEOUT_MS);
 
-        openTrackWebView(track)
-            .then((fn) => { if (disposed) fn(); else cleanupRef.current = fn; })
+        openTrackWebView(track, {
+            onProgress: (value) => {
+                if (disposed) return;
+                if (value >= 85) {
+                    // First-paint proxy — page's own content is now on screen.
+                    if (slowTimer.current) { clearTimeout(slowTimer.current); slowTimer.current = null; }
+                    if (failTimer.current) { clearTimeout(failTimer.current); failTimer.current = null; }
+                }
+            },
+            onError: () => {
+                if (disposed) return;
+                if (slowTimer.current) { clearTimeout(slowTimer.current); slowTimer.current = null; }
+                if (failTimer.current) { clearTimeout(failTimer.current); failTimer.current = null; }
+                setPhase('error');
+            },
+            // onUrlBlocked intentionally unhandled here — the plugin already
+            // sent the payment URL to Chrome Custom Tabs. The user's next
+            // action is inside the browser, not inside the shell.
+        })
+            .then((fn) => {
+                if (disposed) { void fn(); return; }
+                cleanupRef.current = fn;
+            })
             .catch(() => { if (!disposed) setPhase('error'); });
 
         return () => {
             disposed = true;
             if (slowTimer.current) clearTimeout(slowTimer.current);
             if (failTimer.current) clearTimeout(failTimer.current);
-            cleanupRef.current?.();
+            const cleanup = cleanupRef.current;
             cleanupRef.current = null;
+            if (cleanup) void cleanup();   // fire-and-forget async teardown
         };
     }, [native, track, reloadKey]);
 
