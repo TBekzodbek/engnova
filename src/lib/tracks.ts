@@ -1,99 +1,102 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-
-// ── The two independent products Engnova hosts ───────────────────────────────
-// Path A (webview): each track loads its LIVE site in a full-screen in-app
-// webview. The app talks ONLY to the chosen track. Nothing is shared.
+/**
+ * Engnova track definitions
+ * ─────────────────────────
+ * Two independent products the shell can host. The chooser saves the selection;
+ * ProductScreen loads that track's live site in the in-app webview.
+ *
+ * Copy lives in i18n JSON files — this file only carries structure (URLs,
+ * blocked-payment patterns, tint tokens) and keys used to look strings up.
+ *
+ * Old inline taglines removed 2026-08-11 (the previous 'IELTS 9.0 gacha
+ * tayyorgarlik' violated the no-outcome-guarantees rule and was a Play policy
+ * risk — see brief-chooser-copy-ux §0). Never reintroduce.
+ */
 
 export type Track = 'cefr' | 'ielts';
 
 export interface TrackDef {
-  id: Track;
-  name: string;
-  tagline: string;
-  /** Live site loaded in the in-app webview for this track. */
-  url: string;
-  /** Where an unpaid user is sent to activate — opened in the SYSTEM browser,
-   *  never as an in-app purchase (Google Play billing-policy compliance).
-   *  Kept as the site root (safest re: "steering to external payment"); can be
-   *  pointed at /pricing later if we decide that's acceptable. */
-  activateUrl: string;
-  /** URL fragments that must NEVER open inside the app webview (pricing /
-   *  checkout / payment gateways). A hit is bounced out to the system browser.
-   *  Starting set — tuned on-device against real navigation. */
-  blockedPatterns: string[];
-  accent: string;
+    id: Track;
+    /** Live site loaded in the in-app webview. */
+    url: string;
+    /** Where an unpaid user is sent to activate — opened in the SYSTEM browser,
+     *  never as an in-app purchase (Google Play billing-policy compliance). */
+    activateUrl: string;
+    /**
+     * URL fragments that must NEVER open inside the app webview
+     * (pricing / checkout / payment gateways). A hit is bounced to the system
+     * browser. NOTE: substring matching is a v1 heuristic — tickets 10+11
+     * migrate this to a proper allowedHosts + paymentHosts allowlist inside
+     * the custom WebView plugin.
+     */
+    blockedPatterns: string[];
+    /** CSS custom-property names for this track's shell tints (defined in globals.css). */
+    tint: {
+        shell:     string;   // solid, for status bar / progress bar / CTA
+        shellSoft: string;   // low-alpha for backgrounds / glows
+        shellGlow: string;   // box-shadow value
+    };
+    /** i18n key roots — the actual strings live in src/i18n/{lang}.json. */
+    i18n: {
+        name:     'track.cefr.name'     | 'track.ielts.name';
+        tagline:  'track.cefr.tagline'  | 'track.ielts.tagline';
+        features: readonly [string, string, string];
+        audience: 'track.cefr.audience' | 'track.ielts.audience';
+    };
 }
 
 export const TRACKS: Record<Track, TrackDef> = {
-  cefr: {
-    id: 'cefr',
-    name: 'CEFR Academy',
-    tagline: "0 dan C1 gacha — ingliz tili",
-    url: 'https://cefracademy.uz',
-    activateUrl: 'https://cefracademy.uz',
-    blockedPatterns: ['/pricing', 'paycom', 'click.uz'],
-    accent: '#5B50E8',
-  },
-  ielts: {
-    id: 'ielts',
-    name: 'IELTS Level',
-    tagline: 'IELTS 9.0 gacha tayyorgarlik',
-    url: 'https://ieltslevel.uz',
-    activateUrl: 'https://ieltslevel.uz',
-    blockedPatterns: ['/pricing', 'stripe.com', 'paycom', 'click.uz'],
-    accent: '#0EA5E9',
-  },
+    cefr: {
+        id: 'cefr',
+        url: 'https://cefracademy.uz',
+        activateUrl: 'https://cefracademy.uz',
+        blockedPatterns: ['/pricing', 'paycom', 'click.uz'],
+        tint: {
+            shell:     'var(--track-cefr-shell)',
+            shellSoft: 'var(--track-cefr-shell-soft)',
+            shellGlow: 'var(--track-cefr-shell-glow)',
+        },
+        i18n: {
+            name:     'track.cefr.name',
+            tagline:  'track.cefr.tagline',
+            features: ['track.cefr.feature.1', 'track.cefr.feature.2', 'track.cefr.feature.3'] as const,
+            audience: 'track.cefr.audience',
+        },
+    },
+    ielts: {
+        id: 'ielts',
+        url: 'https://ieltslevel.uz',
+        activateUrl: 'https://ieltslevel.uz',
+        blockedPatterns: ['/pricing', 'stripe.com', 'paycom', 'click.uz'],
+        tint: {
+            shell:     'var(--track-ielts-shell)',
+            shellSoft: 'var(--track-ielts-shell-soft)',
+            shellGlow: 'var(--track-ielts-shell-glow)',
+        },
+        i18n: {
+            name:     'track.ielts.name',
+            tagline:  'track.ielts.tagline',
+            features: ['track.ielts.feature.1', 'track.ielts.feature.2', 'track.ielts.feature.3'] as const,
+            audience: 'track.ielts.audience',
+        },
+    },
 };
-
-// ── Per-track Supabase client ────────────────────────────────────────────────
-// RESERVED for native-only integrations (e.g. push-token registration, a native
-// login bridge). The webview flow does NOT use this — the live site handles its
-// own auth/data inside the webview. Kept so those features have a home later.
-
-const ENV: Record<Track, { url?: string; key?: string }> = {
-  cefr: {
-    url: import.meta.env.VITE_CEFR_SUPABASE_URL,
-    key: import.meta.env.VITE_CEFR_SUPABASE_ANON_KEY,
-  },
-  ielts: {
-    url: import.meta.env.VITE_IELTS_SUPABASE_URL,
-    key: import.meta.env.VITE_IELTS_SUPABASE_ANON_KEY,
-  },
-};
-
-const clients: Partial<Record<Track, SupabaseClient>> = {};
-
-export function getSupabase(track: Track): SupabaseClient {
-  const cached = clients[track];
-  if (cached) return cached;
-  const { url, key } = ENV[track];
-  if (!url || !key) {
-    throw new Error(`Missing Supabase env for "${track}" — set VITE_${track.toUpperCase()}_SUPABASE_URL and _ANON_KEY.`);
-  }
-  const client = createClient(url, key, {
-    auth: { storageKey: `engnova.${track}.auth`, persistSession: true, autoRefreshToken: true },
-  });
-  clients[track] = client;
-  return client;
-}
 
 // ── Remembered track choice (switchable, not hardcoded at install) ───────────
-
 const TRACK_KEY = 'engnova.track';
 
 export function getSavedTrack(): Track | null {
-  try {
-    const t = localStorage.getItem(TRACK_KEY);
-    return t === 'cefr' || t === 'ielts' ? t : null;
-  } catch {
-    return null;
-  }
+    try {
+        const t = localStorage.getItem(TRACK_KEY);
+        return t === 'cefr' || t === 'ielts' ? t : null;
+    } catch {
+        return null;
+    }
 }
 
 export function saveTrack(t: Track): void {
-  try { localStorage.setItem(TRACK_KEY, t); } catch { /* ignore */ }
+    try { localStorage.setItem(TRACK_KEY, t); } catch { /* ignore */ }
 }
 
 export function clearTrack(): void {
-  try { localStorage.removeItem(TRACK_KEY); } catch { /* ignore */ }
+    try { localStorage.removeItem(TRACK_KEY); } catch { /* ignore */ }
 }

@@ -1,0 +1,62 @@
+{
+  "chooser.hero": "Where shall we start?",
+  "chooser.subhead.cefr": "CEFR — English from scratch to confident.",
+  "chooser.subhead.ielts": "IELTS — prep for the official exam.",
+  "chooser.footer.line": "You can switch tracks any time.",
+  "chooser.footer.link": "Privacy policy",
+  "chooser.exitToast": "Press back again to exit",
+
+  "lang.sheet.title": "Choose a language",
+  "lang.uz": "Uzbek",
+  "lang.ru": "Russian",
+  "lang.en": "English",
+
+  "track.cefr.name": "CEFR Academy",
+  "track.cefr.tagline": "From zero to C1, one lesson at a time",
+  "track.cefr.feature.1": "Daily plan",
+  "track.cefr.feature.2": "Mock exam",
+  "track.cefr.feature.3": "Writing and speaking",
+  "track.cefr.audience": "For anyone building English from the ground up",
+
+  "track.ielts.name": "IELTS Level",
+  "track.ielts.tagline": "Full four-section IELTS prep",
+  "track.ielts.feature.1": "All four sections",
+  "track.ielts.feature.2": "Real mock tests",
+  "track.ielts.feature.3": "Band-score feedback",
+  "track.ielts.audience": "For anyone preparing for IELTS",
+
+  "loading.kicker": "ONE MOMENT",
+  "loading.line": "Opening",
+  "loading.slow": "Connecting, just a moment",
+
+  "error.headline": "The site isn't responding right now",
+  "error.body": "You're online, but {trackName} didn't load. Wait a moment and try again.",
+  "error.retry": "Try again",
+  "error.switch": "Switch track",
+
+  "offline.headline": "You're offline",
+  "offline.body": "Connect to Wi-Fi or mobile data to continue.",
+  "offline.retry": "Check again",
+  "offline.settings": "Open settings",
+
+  "switch.title": "Switch tracks?",
+  "switch.body": "The current window will close. Your progress in {currentTrackName} stays put — it'll be waiting when you come back.",
+  "switch.confirm": "Yes, switch",
+  "switch.cancel": "Cancel",
+
+  "switch.button.long": "Switch track",
+  "switch.button.short": "Switch",
+
+  "webPreview.explainer": "This browser preview can't load the live site. Inside the app, this screen opens in full.",
+  "webPreview.cta": "Open in browser",
+
+  "perm.mic.title": "Allow microphone access?",
+  "perm.mic.body": "Needed to record your voice in speaking practice. The recording stays on your device.",
+  "perm.mic.allow": "Allow",
+  "perm.mic.deny": "Not now",
+
+  "perm.notif.title": "Turn on reminders?",
+  "perm.notif.body": "We'll send a short reminder for your practice. You can turn it off any time.",
+  "perm.notif.allow": "Turn on",
+  "perm.notif.deny": "Not now"
+}

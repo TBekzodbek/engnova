@@ -1,0 +1,62 @@
+{
+  "chooser.hero": "С чего начнём?",
+  "chooser.subhead.cefr": "CEFR — английский с нуля до свободного уровня.",
+  "chooser.subhead.ielts": "IELTS — подготовка к официальному экзамену.",
+  "chooser.footer.line": "Направление можно сменить в любой момент.",
+  "chooser.footer.link": "Политика конфиденциальности",
+  "chooser.exitToast": "Нажмите ещё раз, чтобы выйти",
+
+  "lang.sheet.title": "Выберите язык",
+  "lang.uz": "Узбекский",
+  "lang.ru": "Русский",
+  "lang.en": "Английский",
+
+  "track.cefr.name": "CEFR Academy",
+  "track.cefr.tagline": "С нуля до C1, каждый день понемногу",
+  "track.cefr.feature.1": "Ежедневный план",
+  "track.cefr.feature.2": "Пробный экзамен",
+  "track.cefr.feature.3": "Письмо и речь",
+  "track.cefr.audience": "Для тех, кто строит английский с основы",
+
+  "track.ielts.name": "IELTS Level",
+  "track.ielts.tagline": "Подготовка ко всем четырём секциям",
+  "track.ielts.feature.1": "Все четыре секции",
+  "track.ielts.feature.2": "Реальные пробники",
+  "track.ielts.feature.3": "Оценка по band",
+  "track.ielts.audience": "Для тех, кто готовится к IELTS",
+
+  "loading.kicker": "СЕКУНДУ",
+  "loading.line": "Открываем",
+  "loading.slow": "Соединяемся, ещё чуть-чуть",
+
+  "error.headline": "Сайт сейчас не отвечает",
+  "error.body": "Интернет есть, но {trackName} не загрузился. Подождите немного и попробуйте снова.",
+  "error.retry": "Повторить",
+  "error.switch": "Другое направление",
+
+  "offline.headline": "Нет подключения к интернету",
+  "offline.body": "Подключитесь к Wi-Fi или мобильному интернету, чтобы продолжить.",
+  "offline.retry": "Проверить снова",
+  "offline.settings": "Открыть настройки",
+
+  "switch.title": "Сменить направление?",
+  "switch.body": "Текущее окно закроется. Ваш прогресс в {currentTrackName} сохранится и будет ждать вас.",
+  "switch.confirm": "Да, сменить",
+  "switch.cancel": "Отмена",
+
+  "switch.button.long": "Сменить направление",
+  "switch.button.short": "Сменить",
+
+  "webPreview.explainer": "Веб-превью не может загрузить живой сайт. В приложении этот экран открывается полностью.",
+  "webPreview.cta": "Открыть в браузере",
+
+  "perm.mic.title": "Разрешить доступ к микрофону?",
+  "perm.mic.body": "Нужен для записи вашей речи в устном задании. Запись не покидает ваше устройство.",
+  "perm.mic.allow": "Разрешить",
+  "perm.mic.deny": "Не сейчас",
+
+  "perm.notif.title": "Включить напоминания?",
+  "perm.notif.body": "Пришлём короткое напоминание к вашему занятию. Отключить можно в любой момент.",
+  "perm.notif.allow": "Включить",
+  "perm.notif.deny": "Не сейчас"
+}

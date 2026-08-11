@@ -1,0 +1,103 @@
+.lang-sheet-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(4, 5, 12, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: sheet-scrim-in var(--motion-base) var(--ease) both;
+}
+
+@keyframes sheet-scrim-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.lang-sheet {
+    width: 100%;
+    max-width: 560px;
+    background: var(--color-surface);
+    border-top-left-radius:  var(--radius-xl);
+    border-top-right-radius: var(--radius-xl);
+    padding:
+        var(--space-sm)
+        var(--space-lg)
+        calc(var(--space-lg) + var(--safe-bottom))
+        var(--space-lg);
+    animation: sheet-in var(--motion-slow) var(--ease) both;
+    box-shadow: 0 -20px 40px -12px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes sheet-in {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
+.lang-sheet-grip {
+    width: 36px;
+    height: 4px;
+    margin: 4px auto 12px;
+    border-radius: var(--radius-full);
+    background: var(--color-line-hi);
+}
+
+.lang-sheet-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.lang-sheet-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lang-sheet-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px; /* touch target */
+    padding: 0 14px;
+    border-radius: var(--radius-md);
+    text-align: left;
+    color: var(--color-ink);
+    transition: background var(--motion-fast) var(--ease);
+}
+
+.lang-sheet-row:hover,
+.lang-sheet-row:focus-visible {
+    background: var(--color-surface-hi);
+}
+
+.lang-sheet-row.is-active {
+    background: var(--color-accent-soft);
+}
+
+.lang-sheet-code {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-subtle);
+    width: 28px;
+}
+
+.lang-sheet-row.is-active .lang-sheet-code {
+    color: var(--color-accent);
+}
+
+.lang-sheet-label {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.lang-sheet-tick {
+    color: var(--color-accent);
+}

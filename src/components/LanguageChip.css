@@ -1,0 +1,32 @@
+.lang-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+    padding: 0 10px 0 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink);
+    border-radius: var(--radius-full);
+    font-size: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    transition:
+        background var(--motion-fast) var(--ease),
+        border-color var(--motion-fast) var(--ease),
+        transform var(--motion-fast) var(--ease);
+}
+
+.lang-chip:hover:not(:disabled) {
+    background: var(--color-surface-hi);
+    border-color: var(--color-line-hi);
+}
+
+.lang-chip:active {
+    transform: scale(0.96);
+}
+
+.lang-chip-code {
+    line-height: 1;
+}

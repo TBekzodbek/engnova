@@ -1,0 +1,179 @@
+/*
+ * Engnova global CSS
+ * ──────────────────
+ * The tokens.ts values re-exported as CSS custom properties so components can
+ * style with `var(--color-ink)` etc. Dark is default; light kicks in on
+ * `@media (prefers-color-scheme: light)`. Users can force via
+ * `data-theme="light"|"dark"` on the root (LanguageSheet + future settings).
+ *
+ * Per-track shell tints (--track-*-shell) are ALWAYS defined so components
+ * can adopt them by writing `--track-shell` locally when a track is chosen.
+ *
+ * Safe-area padding is baked in for edge-to-edge (Android 15 targetSdk 36 will
+ * enforce this; we ship it now).
+ */
+
+:root {
+    color-scheme: dark light;
+
+    /* Dark theme — the default */
+    --color-bg:            #08080C;
+    --color-surface:       #111219;
+    --color-surface-hi:    #1A1B25;
+    --color-line:          #232435;
+    --color-line-hi:       #343550;
+    --color-ink:           #EDEFF6;
+    --color-muted:         #A0A7BD;
+    --color-subtle:        #6B7088;
+    --color-accent:        #7B72EE;
+    --color-accent-soft:   #7B72EE1F;
+    --shadow-accent:       0 12px 30px -8px #554be780;
+    --color-success:       #3ECB8C;
+    --color-warning:       #F0A63C;
+    --color-danger:        #F2585E;
+
+    /* Per-track shell tints (constant; both themes) */
+    --track-cefr-shell:      #5B50E8;
+    --track-cefr-shell-soft: #5B50E829;
+    --track-cefr-shell-glow: 0 20px 40px -12px #5B50E866;
+    --track-ielts-shell:      #4F46E5;
+    --track-ielts-shell-soft: #4F46E529;
+    --track-ielts-shell-glow: 0 20px 40px -12px #4F46E566;
+
+    /* Radii */
+    --radius-sm:   8px;
+    --radius-md:   12px;
+    --radius-lg:   16px;
+    --radius-xl:   20px;
+    --radius-full: 999px;
+
+    /* Spacing */
+    --space-xs: 4px;   --space-sm: 8px;   --space-md: 16px;
+    --space-lg: 24px;  --space-xl: 32px;  --space-xxl: 48px;
+
+    /* Motion */
+    --motion-fast: 160ms;
+    --motion-base: 260ms;
+    --motion-slow: 460ms;
+    --ease:        cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in:     cubic-bezier(0.32, 0, 0.67, 0);
+
+    /* Type */
+    --font-stack:      system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-stack-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+    /* Safe-area (edge-to-edge display cutout support) */
+    --safe-top:    env(safe-area-inset-top,    0px);
+    --safe-right:  env(safe-area-inset-right,  0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left:   env(safe-area-inset-left,   0px);
+}
+
+/* ── Light theme via system preference ────────────────────────────────── */
+@media (prefers-color-scheme: light) {
+    :root {
+        --color-bg:            #F6F7FB;
+        --color-surface:       #FFFFFF;
+        --color-surface-hi:    #FCFCFF;
+        --color-line:          #E9EAF1;
+        --color-line-hi:       #D2D5E2;
+        --color-ink:           #0B1020;
+        --color-muted:         #565E72;
+        --color-subtle:        #9098AC;
+        --color-accent:        #554BE7;
+        --color-accent-soft:   #554BE71A;
+        --shadow-accent:       0 12px 30px -8px #554be750;
+        --color-success:       #1F9D6B;
+        --color-warning:       #D98A1F;
+        --color-danger:        #E0464C;
+    }
+}
+
+/* ── Explicit theme overrides (user toggle wins) ──────────────────────── */
+:root[data-theme='dark'] {
+    --color-bg:            #08080C;
+    --color-surface:       #111219;
+    --color-surface-hi:    #1A1B25;
+    --color-line:          #232435;
+    --color-line-hi:       #343550;
+    --color-ink:           #EDEFF6;
+    --color-muted:         #A0A7BD;
+    --color-subtle:        #6B7088;
+    --color-accent:        #7B72EE;
+    --color-accent-soft:   #7B72EE1F;
+    --shadow-accent:       0 12px 30px -8px #554be780;
+    --color-success:       #3ECB8C;
+    --color-warning:       #F0A63C;
+    --color-danger:        #F2585E;
+}
+:root[data-theme='light'] {
+    --color-bg:            #F6F7FB;
+    --color-surface:       #FFFFFF;
+    --color-surface-hi:    #FCFCFF;
+    --color-line:          #E9EAF1;
+    --color-line-hi:       #D2D5E2;
+    --color-ink:           #0B1020;
+    --color-muted:         #565E72;
+    --color-subtle:        #9098AC;
+    --color-accent:        #554BE7;
+    --color-accent-soft:   #554BE71A;
+    --shadow-accent:       0 12px 30px -8px #554be750;
+    --color-success:       #1F9D6B;
+    --color-warning:       #D98A1F;
+    --color-danger:        #E0464C;
+}
+
+/* ── Reset + baseline ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-stack);
+    font-feature-settings: 'cv11', 'ss01';
+    background: var(--color-bg);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Body-level transition so theme flips feel smooth (matches IELTS) */
+    transition: background-color var(--motion-base) var(--ease),
+                color            var(--motion-base) var(--ease);
+    /* Prevent the whole page from bouncing on iOS-style pull */
+    overscroll-behavior: none;
+}
+
+button {
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    /* Guarantee 44dp min touch target in components that forget */
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+}
+
+img, svg { display: block; max-width: 100%; }
+
+/* Respect users who ask for less motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

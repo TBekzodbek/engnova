@@ -1,72 +1,298 @@
+/*
+ * ChooserScreen — the only screen the shell owns.
+ *
+ * Layout goal: a calm lobby that looks composed at 375×667 (small Android)
+ * and only gets more breathing room at 480+. Vertical scroll allowed but
+ * NEVER required at 812px (Pixel 8) — the whole screen fits above the fold.
+ */
+
 .chooser {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  padding: 2rem 1.25rem;
+    min-height: 100dvh;
+    padding:
+        calc(var(--safe-top) + var(--space-md))
+        calc(var(--safe-right) + var(--space-lg))
+        calc(var(--safe-bottom) + var(--space-lg))
+        calc(var(--safe-left) + var(--space-lg));
+    background: var(--color-bg);
+    color: var(--color-ink);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    max-width: 720px;
+    margin: 0 auto;
+    transition: opacity var(--motion-slow) var(--ease);
 }
 
-.chooser-head { text-align: center; }
+/* Hand-off dim — cards animate; the rest fades ~30% so the target card reads
+   as the anchor for the transition into ProductScreen. */
+.chooser.is-handing-off .chooser-topbar,
+.chooser.is-handing-off .chooser-hero,
+.chooser.is-handing-off .chooser-foot {
+    opacity: 0.35;
+    transform: translateY(-4px);
+    transition:
+        opacity   var(--motion-base) var(--ease),
+        transform var(--motion-base) var(--ease);
+}
+
+/* ── Topbar (brand + lang chip) ─────────────────────────────────────── */
+.chooser-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+}
 
 .chooser-brand {
-  font-size: 2.4rem;
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: -0.02em;
-  background: linear-gradient(90deg, #5B50E8, #0EA5E9);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-ink);
+    /* Reserved for a real wordmark; text-only for v1 */
 }
 
-.chooser-sub {
-  margin: 0.35rem 0 0;
-  color: #A0A0B8;
-  font-size: 1rem;
+/* ── Hero ────────────────────────────────────────────────────────────── */
+.chooser-hero {
+    margin-top: var(--space-md);
+    animation: rise-in var(--motion-slow) var(--ease) both;
 }
 
+@keyframes rise-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.chooser-title {
+    font-size: 30px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    margin: 0 0 var(--space-sm);
+    text-wrap: balance;
+    max-width: 22ch;
+}
+
+.chooser-subhead {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.chooser-subhead-line {
+    display: block;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────── */
 .chooser-cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  width: 100%;
-  max-width: 460px;
-}
-
-@media (min-width: 520px) {
-  .chooser-cards { grid-template-columns: 1fr 1fr; }
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
 }
 
 .track-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  text-align: center;
-  padding: 1.75rem 1.25rem;
-  border-radius: 20px;
-  cursor: pointer;
-  background: #15151F;
-  color: #F5F5FA;
-  border: 1px solid #262636;
-  border-top: 3px solid var(--accent);
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: var(--space-md);
+    align-items: center;
+    padding: var(--space-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl);
+    text-align: left;
+    color: var(--color-ink);
+    transition:
+        transform      var(--motion-base) var(--ease),
+        border-color   var(--motion-base) var(--ease),
+        background     var(--motion-base) var(--ease),
+        box-shadow     var(--motion-base) var(--ease),
+        opacity        var(--motion-base) var(--ease);
+    animation: rise-in var(--motion-slow) var(--ease) both;
+    animation-delay: 120ms;
 }
 
-.track-card:hover,
-.track-card:focus-visible {
-  transform: translateY(-3px);
-  border-color: var(--accent);
-  box-shadow: 0 12px 32px -12px var(--accent);
-  outline: none;
+.track-card:nth-of-type(2) {
+    animation-delay: 200ms;
 }
 
-.track-card svg { color: var(--accent); }
+.track-card:hover:not(:disabled) {
+    border-color: var(--track-shell);
+    box-shadow: var(--track-shell-glow);
+    transform: translateY(-1px);
+}
 
-.track-name { font-size: 1.15rem; font-weight: 700; }
+.track-card:active:not(:disabled) {
+    transform: scale(0.985);
+    transition-duration: var(--motion-fast);
+}
 
-.track-tag { font-size: 0.85rem; color: #A0A0B8; }
+.track-card:disabled {
+    cursor: default;
+}
 
-.chooser-foot { color: #6B6B85; font-size: 0.8rem; margin: 0; }
+/* Handoff choreography — pressed card scales up + glows brighter, other dims */
+.track-card.is-pressed {
+    transform: scale(1.02);
+    border-color: var(--track-shell);
+    background: var(--color-surface-hi);
+    box-shadow: var(--track-shell-glow), 0 0 0 1px var(--track-shell);
+}
+
+.track-card.is-dimmed {
+    opacity: 0.3;
+    transform: scale(0.97);
+    filter: saturate(0.5);
+}
+
+/* Illustration column */
+.track-illust-wrap {
+    position: relative;
+    width: 92px;
+    height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-ink);
+}
+
+.track-illust {
+    width: 84px;
+    height: 84px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Soft glow behind illustration — picks up track tint */
+.track-illust-glow {
+    position: absolute;
+    inset: -8px;
+    background: radial-gradient(closest-side, var(--track-shell-soft), transparent 70%);
+    filter: blur(6px);
+    z-index: 0;
+    opacity: 0.9;
+}
+
+/* Body column */
+.track-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.track-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+}
+
+.track-tagline {
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--color-muted);
+    margin-bottom: 6px;
+}
+
+.track-features {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+}
+
+.track-feature {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-ink);
+    opacity: 0.85;
+}
+
+.track-feature-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--track-shell);
+    opacity: 0.9;
+}
+
+.track-audience {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-subtle);
+    margin-top: 6px;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+.chooser-foot {
+    margin-top: auto;
+    padding-top: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--color-muted);
+    animation: rise-in var(--motion-slow) var(--ease) both;
+    animation-delay: 300ms;
+}
+
+.chooser-foot-line {
+    opacity: 0.9;
+}
+
+.chooser-foot-sep {
+    opacity: 0.5;
+}
+
+.chooser-foot-link {
+    color: var(--color-ink);
+    opacity: 0.85;
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-line);
+    padding-bottom: 1px;
+    transition: opacity var(--motion-fast) var(--ease),
+                border-color var(--motion-fast) var(--ease);
+}
+
+.chooser-foot-link:hover {
+    opacity: 1;
+    border-color: var(--color-accent);
+}
+
+/* ── Larger screens: side-by-side cards ───────────────────────────────── */
+@media (min-width: 560px) {
+    .chooser-cards {
+        flex-direction: row;
+    }
+    .track-card {
+        flex: 1;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        padding: var(--space-lg);
+        text-align: center;
+        align-items: center;
+    }
+    .track-illust-wrap {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+    }
+    .track-illust {
+        width: 108px;
+        height: 108px;
+    }
+    .track-features {
+        justify-content: center;
+    }
+}

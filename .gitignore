@@ -6,3 +6,6 @@ android
 ios
 .DS_Store
 *.log
+
+# Local machine utility scripts (owner-only, not part of the app)
+*.ps1

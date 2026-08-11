@@ -1,0 +1,62 @@
+{
+  "chooser.hero": "Qayerdan boshlaymiz?",
+  "chooser.subhead.cefr": "CEFR — noldan boshlab ingliz tili.",
+  "chooser.subhead.ielts": "IELTS — rasmiy imtihonga puxta tayyorgarlik.",
+  "chooser.footer.line": "Yo'nalishni istalgan vaqtda o'zgartirasiz.",
+  "chooser.footer.link": "Maxfiylik siyosati",
+  "chooser.exitToast": "Chiqish uchun yana bir marta bosing",
+
+  "lang.sheet.title": "Tilni tanlang",
+  "lang.uz": "O'zbekcha",
+  "lang.ru": "Ruscha",
+  "lang.en": "Inglizcha",
+
+  "track.cefr.name": "CEFR Academy",
+  "track.cefr.tagline": "0 dan C1 gacha, kundalik mashq bilan",
+  "track.cefr.feature.1": "Kunlik reja",
+  "track.cefr.feature.2": "Mock imtihon",
+  "track.cefr.feature.3": "Yozma va og'zaki mashq",
+  "track.cefr.audience": "Ingliz tilini asosidan qurayotganlar uchun",
+
+  "track.ielts.name": "IELTS Level",
+  "track.ielts.tagline": "To'rt bo'lim bo'yicha rasmiy tayyorgarlik",
+  "track.ielts.feature.1": "To'rt bo'lim mashqi",
+  "track.ielts.feature.2": "Real mock testlar",
+  "track.ielts.feature.3": "Band-score baholov",
+  "track.ielts.audience": "IELTS imtihoniga tayyorlanayotganlar uchun",
+
+  "loading.kicker": "BIR LAHZA",
+  "loading.line": "Ochilmoqda",
+  "loading.slow": "Ulanmoqda, biroz sabr",
+
+  "error.headline": "Sayt hozir javob bermayapti",
+  "error.body": "Internet ulangan, biroq {trackName} yuklanmadi. Biroz kuting va qaytadan urinib ko'ring.",
+  "error.retry": "Qayta urinish",
+  "error.switch": "Boshqa yo'nalish",
+
+  "offline.headline": "Internet ulanmagan",
+  "offline.body": "Mashg'ulotlar uchun Wi-Fi yoki mobil internetga ulaning.",
+  "offline.retry": "Qayta tekshirish",
+  "offline.settings": "Sozlamalarni ochish",
+
+  "switch.title": "Yo'nalishni almashtirasizmi?",
+  "switch.body": "Joriy oyna yopiladi. Sizning progressingiz {currentTrackName}da qoladi va qaytganingizda joyida bo'ladi.",
+  "switch.confirm": "Ha, almashtiraman",
+  "switch.cancel": "Bekor qilish",
+
+  "switch.button.long": "Yo'nalishni almashtirish",
+  "switch.button.short": "Almashtirish",
+
+  "webPreview.explainer": "Brauzer preview jonli saytni yuklay olmaydi. Ilovada bu ekran to'liq ochiladi.",
+  "webPreview.cta": "Brauzerda ochish",
+
+  "perm.mic.title": "Mikrofonga ruxsat berasizmi?",
+  "perm.mic.body": "Og'zaki mashqda ovozingizni yozib olish uchun kerak. Yozuv qurilmangizdan chiqmaydi.",
+  "perm.mic.allow": "Ruxsat berish",
+  "perm.mic.deny": "Hozir emas",
+
+  "perm.notif.title": "Eslatmalar yoqilsinmi?",
+  "perm.notif.body": "Mashg'ulot vaqtida qisqa eslatma yuboramiz. Istalgan payt o'chirasiz.",
+  "perm.notif.allow": "Yoqish",
+  "perm.notif.deny": "Hozircha kerak emas"
+}
