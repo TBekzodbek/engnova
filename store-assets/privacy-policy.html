@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engnova · Privacy Policy</title>
+<meta name="description" content="Privacy policy for the Engnova Android app (uz.engnova.app), a thin native shell hosting CEFR Academy and IELTS Level.">
+<meta name="theme-color" content="#08080C" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<style>
+  :root {
+    --accent: #554be7;
+    --accent-hover: #6a61ec;
+    --bg: #ffffff;
+    --fg: #1a1a25;
+    --muted: #5b5b6b;
+    --border: #e6e6ee;
+    --card: #f7f7fb;
+    --code-bg: #f0f0f6;
+    --shadow: 0 1px 2px rgba(10, 10, 30, 0.04);
+    --max-w: 720px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #08080C;
+      --fg: #e9e9f2;
+      --muted: #9b9bb0;
+      --border: #1e1e2c;
+      --card: #10101a;
+      --code-bg: #14141f;
+      --accent: #7b73f0;
+      --accent-hover: #9089f4;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --accent: #554be7;
+    --accent-hover: #6a61ec;
+    --bg: #ffffff;
+    --fg: #1a1a25;
+    --muted: #5b5b6b;
+    --border: #e6e6ee;
+    --card: #f7f7fb;
+    --code-bg: #f0f0f6;
+    --shadow: 0 1px 2px rgba(10, 10, 30, 0.04);
+  }
+  :root[data-theme="dark"] {
+    --bg: #08080C;
+    --fg: #e9e9f2;
+    --muted: #9b9bb0;
+    --border: #1e1e2c;
+    --card: #10101a;
+    --code-bg: #14141f;
+    --accent: #7b73f0;
+    --accent-hover: #9089f4;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .wrap {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 24px 20px 64px;
+  }
+
+  header.mast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--fg);
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+
+  h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    line-height: 1.2;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  h2 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin: 40px 0 12px;
+    letter-spacing: -0.01em;
+    font-weight: 650;
+    font-weight: 600;
+  }
+  h1 + p.effective {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0 0 4px;
+  }
+  p, ul { margin: 0 0 16px; }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  li > ul { margin-top: 6px; }
+
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  a:hover, a:focus { color: var(--accent-hover); }
+
+  code, .mono {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 0.92em;
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  strong { font-weight: 650; font-weight: 600; }
+
+  .contact-card {
+    margin-top: 10px;
+    padding: 14px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .contact-card .email {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-weight: 600;
+    color: var(--fg);
+    word-break: break-all;
+  }
+  .copy-btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--fg);
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .copy-btn:hover, .copy-btn:focus {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    outline: none;
+  }
+  .copy-btn[data-copied="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  footer.foot {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  footer.foot a { color: var(--muted); }
+  footer.foot a:hover { color: var(--accent); }
+
+  @media (max-width: 480px) {
+    .wrap { padding: 20px 16px 48px; }
+    header.mast { padding: 4px 0 20px; margin-bottom: 24px; }
+    h2 { margin-top: 32px; }
+  }
+
+  @media print {
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --muted: #333333;
+      --border: #cccccc;
+      --card: #ffffff;
+      --code-bg: #f2f2f2;
+      --accent: #000000;
+      --shadow: none;
+    }
+    body { background: #fff; color: #000; font-size: 11pt; line-height: 1.5; }
+    .wrap { max-width: none; padding: 0; margin: 0.75in; }
+    a { color: #000; text-decoration: underline; }
+    a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; color: #444; }
+    .copy-btn { display: none; }
+    header.mast { border-color: #999; margin-bottom: 20px; }
+    footer.foot { border-color: #999; color: #000; }
+    h2 { page-break-after: avoid; }
+    p, li { page-break-inside: avoid; }
+    .contact-card { box-shadow: none; border: 1px solid #999; background: #fff; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="mast">
+      <a class="brand" href="https://cefracademy.uz" aria-label="Engnova home">
+        <svg class="brand-mark" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="mark-bg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#0B0B18"/>
+              <stop offset="0.6" stop-color="#08081A"/>
+              <stop offset="1" stop-color="#050514"/>
+            </linearGradient>
+            <radialGradient id="mark-bloom" cx="0.5" cy="0.46" r="0.75">
+              <stop offset="0" stop-color="#554BE7" stop-opacity="0.65"/>
+              <stop offset="0.4" stop-color="#554BE7" stop-opacity="0.20"/>
+              <stop offset="1" stop-color="#554BE7" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="mark-star" x1="0" y1="0" x2="0.7" y2="1">
+              <stop offset="0" stop-color="#FFFFFF"/>
+              <stop offset="0.7" stop-color="#E9ECFF"/>
+              <stop offset="1" stop-color="#C7D6FF"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#mark-bg)"/>
+          <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#mark-bloom)"/>
+          <path d="M 256 91 L 297.01 194.99 L 401 236 L 297.01 277.01 L 256 381 L 214.99 277.01 L 111 236 L 214.99 194.99 Z"
+                fill="url(#mark-star)" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="256" cy="236" r="22" fill="#FFFFFF" fill-opacity="0.9"/>
+        </svg>
+        <span>Engnova</span>
+      </a>
+    </header>
+
+    <main>
+      <h1>Engnova Privacy Policy</h1>
+      <p class="effective"><strong>Effective date:</strong> 2026-08-11</p>
+
+      <h2>1. Who we are</h2>
+      <p>Engnova is a mobile app shell (package <code>uz.engnova.app</code>) that hosts two independent English-learning products behind a chooser:</p>
+      <ul>
+        <li><strong>CEFR Academy</strong> — 0 to C1 English course, published at <a href="https://cefracademy.uz">cefracademy.uz</a>.</li>
+        <li><strong>IELTS Level</strong> — IELTS band preparation, published at <a href="https://ieltslevel.uz">ieltslevel.uz</a>.</li>
+      </ul>
+      <p>The Engnova app itself is a thin native shell: after you pick a track, the product's live website loads inside a native WebView. This policy covers what the <strong>app shell</strong> does. Each underlying site has its own separate privacy policy (linked below) that governs everything you do inside that track.</p>
+
+      <h2>2. What the app collects</h2>
+      <p>The Engnova app collects only what is strictly required for you to sign in and use the speaking features.</p>
+      <ul>
+        <li>
+          <strong>Login credentials (email + password).</strong> When you sign in from inside the app, the email and password you enter are passed directly to the Supabase Auth service for the track you selected. We do not read, log, store, or forward them anywhere else.
+          <ul>
+            <li>CEFR Academy uses Supabase project <code>mctcstvjdpcnzypfjhka</code>.</li>
+            <li>IELTS Level uses Supabase project <code>qpukasdtcwwgnehpjhud</code>.</li>
+          </ul>
+        </li>
+        <li><strong>Microphone audio.</strong> The <code>RECORD_AUDIO</code> permission is only requested when you start a speaking-practice task. The audio is captured via the standard <code>getUserMedia</code> API in the WebView and sent to the selected track's own backend for grading. It is not sent to Engnova servers and is not recorded outside the active exercise.</li>
+        <li>
+          <strong>Nothing else.</strong> The app does <strong>not</strong> collect:
+          <ul>
+            <li>Location (no <code>ACCESS_FINE_LOCATION</code> or <code>ACCESS_COARSE_LOCATION</code>).</li>
+            <li>Device identifiers, IMEI, or MAC address.</li>
+            <li>Advertising ID.</li>
+            <li>Contacts, calendar, photos, or files.</li>
+            <li>Crash reports or performance telemetry.</li>
+            <li>Analytics events. No analytics SDK, no crash-reporting SDK, and no advertising SDK are bundled in the app.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2>3. What the underlying sites collect</h2>
+      <p>Once a track loads inside the WebView, you are using that track's website, and its own privacy policy applies to any data you enter or generate there (profile, learning progress, mock scores, chat history, etc.).</p>
+      <ul>
+        <li>CEFR Academy site policy: <a href="https://cefracademy.uz/privacy">https://cefracademy.uz/privacy</a></li>
+        <li>IELTS Level site policy: <a href="https://ieltslevel.uz/privacy">https://ieltslevel.uz/privacy</a></li>
+      </ul>
+
+      <h2>4. Data retention</h2>
+      <ul>
+        <li>The app itself stores only two things on the device: a small <strong>boot hint</strong> remembering which track you last used (so the chooser can jump you back in), and your <strong>language preference</strong> (Uzbek, Russian, or English).</li>
+        <li>Android auto-backup is disabled (<code>android:allowBackup="false"</code>) and <code>data_extraction_rules</code> exclude all app data, so none of the app's local state is uploaded to Google Drive or copied off the device.</li>
+        <li>Retention of anything you create or submit inside a track (progress, mock scores, account records) is governed by that track's own site policy.</li>
+      </ul>
+
+      <h2>5. Payments</h2>
+      <p>Engnova processes <strong>no payments in-app</strong>. All purchases happen on the website, opened in a Chrome Custom Tab, via Uzbekistan's national payment gateways:</p>
+      <ul>
+        <li>Payme — <code>paycom.uz</code></li>
+        <li>Click — <code>click.uz</code></li>
+      </ul>
+      <p>Google Play Billing is not available for these Uzbekistan-national payment gateways, which is why checkout is delegated to the site.</p>
+
+      <h2>6. Data deletion</h2>
+      <p>You can request deletion of your account and associated data through each track's account settings on the website:</p>
+      <ul>
+        <li>CEFR Academy: sign in at <a href="https://cefracademy.uz">https://cefracademy.uz</a> and use the account settings page.</li>
+        <li>IELTS Level: sign in at <a href="https://ieltslevel.uz">https://ieltslevel.uz</a> and use the account settings page.</li>
+      </ul>
+      <p>Because the app shell keeps no server-side data of its own, uninstalling the app removes the boot hint and language preference from the device. Uninstalling does not by itself delete your account on either track's website — use the site to do that.</p>
+
+      <h2>7. Children</h2>
+      <p>The app is suitable for all ages and does not knowingly collect personal information from children under 13. Sign-up is not directed at children under 13.</p>
+
+      <h2>8. Changes to this policy</h2>
+      <p>If this policy changes materially, a notice is shown inside the app on first launch after the update, and the "Effective date" at the top of this page is updated. Continued use of the app after the notice constitutes acceptance of the revised policy.</p>
+
+      <h2>9. Contact</h2>
+      <p>Questions about this policy or about the Engnova app can be sent to:</p>
+      <div class="contact-card">
+        <a class="email" href="mailto:engnovaapp@gmail.com">engnovaapp@gmail.com</a>
+        <button type="button" class="copy-btn" id="copyEmailBtn" aria-label="Copy email address to clipboard">Copy</button>
+      </div>
+      <p style="margin-top:16px">For questions about a specific track's site, please use the contact channels on that track's own website.</p>
+    </main>
+
+    <footer class="foot">
+      <span>Last updated: 2026-08-11</span>
+      <a href="https://cefracademy.uz">Back to Engnova &rarr;</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('copyEmailBtn');
+      if (!btn) return;
+      var email = 'engnovaapp@gmail.com';
+      var originalLabel = btn.textContent;
+      var timeoutId = null;
+
+      function flash(text) {
+        btn.textContent = text;
+        btn.setAttribute('data-copied', 'true');
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(function () {
+          btn.textContent = originalLabel;
+          btn.removeAttribute('data-copied');
+        }, 1600);
+      }
+
+      function fallbackCopy() {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = email;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          flash(ok ? 'Copied' : 'Copy failed');
+        } catch (e) {
+          flash('Copy failed');
+        }
+      }
+
+      btn.addEventListener('click', function () {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(email).then(function () {
+            flash('Copied');
+          }, fallbackCopy);
+        } else {
+          fallbackCopy();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

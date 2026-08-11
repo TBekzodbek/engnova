@@ -13,6 +13,7 @@
     "keystore:generate": "node scripts/generate-upload-keystore.mjs",
     "graphics:export": "node scripts/export-store-graphics.mjs",
     "screenshots:capture": "node scripts/capture-screenshots.mjs",
+    "preflight": "node scripts/preflight-check.mjs",
     "build:apk:debug": "npm run cap:android && cd android && gradlew.bat assembleDebug",
     "build:apk:release": "npm run cap:android && cd android && gradlew.bat assembleRelease",
     "build:aab": "npm run cap:android && cd android && gradlew.bat bundleRelease"

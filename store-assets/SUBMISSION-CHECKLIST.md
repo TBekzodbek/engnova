@@ -129,6 +129,19 @@ Answer YES / NO honestly — the entries below are what Engnova should truthfull
 
 ---
 
+## 8a. App Links (optional but recommended)
+
+Tapping a `https://cefracademy.uz/*` or `https://ieltslevel.uz/*` link on a device with Engnova installed should open the app, not the browser. The manifest already declares the `autoVerify="true"` intent filters and `MainActivity.handleDeepLink` writes `engnova.track` + `engnova.pendingDeepLink` into localStorage on both cold- and warm-start. Verification is gated on both domains publishing a matching `assetlinks.json`.
+
+- [ ] Publish `assetlinks.json` at `https://cefracademy.uz/.well-known/assetlinks.json` — copy from `store-assets/assetlinks-cefracademy.json`, replacing `<REPLACE_WITH_UPLOAD_KEY_SHA256>` with the app-signing SHA-256 fingerprint (see comment header in that file). Strip the header comment; the served file must be valid JSON.
+- [ ] Publish `assetlinks.json` at `https://ieltslevel.uz/.well-known/assetlinks.json` — copy from `store-assets/assetlinks-ieltslevel.json`, same fingerprint as the cefracademy file (same app, same key).
+- [ ] Sanity-check that both URLs return HTTP 200 with `Content-Type: application/json` and no redirects — `curl -sI https://cefracademy.uz/.well-known/assetlinks.json` and same for ieltslevel. A 301 to `www.` or an HTML 404 page will silently fail verification.
+- [ ] After a signed build is on device: run `adb shell pm get-app-links uz.engnova.app` — expect **`verified`** next to `cefracademy.uz`, `www.cefracademy.uz`, `ieltslevel.uz`, and `www.ieltslevel.uz`. `1024 (verification pending)` means retry after a minute; `legacy_failure` means fingerprint mismatch.
+- [ ] Play Console → Release → **App links** (under Setup): should show a green check for both domains after the next production release is live. Errors here per-host are why the manifest keeps one `<intent-filter>` per top-level host — a mistake on one domain doesn't hide behind a pass on the other.
+- [ ] Manual smoke test — from any browser, tap `https://cefracademy.uz/dashboard` and `https://ieltslevel.uz/pricing` on a device that has the release build. First tap should surface Android's "Open with" chooser (Engnova + Chrome); after picking "Always", subsequent taps go straight to the app.
+
+---
+
 ## 9. Data safety (Policy → App content → Data safety)
 
 Walk through the form with `store-assets/data-safety-form.md` open next to you — that file is the source of truth for every answer.

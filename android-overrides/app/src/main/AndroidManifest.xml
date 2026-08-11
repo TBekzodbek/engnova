@@ -34,6 +34,36 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!--
+              Android App Links — one <intent-filter> PER top-level host so
+              Play Console's App Links verification report surfaces failures
+              per-host (grouping cefracademy.uz + ieltslevel.uz into a single
+              filter would hide a broken assetlinks.json on one domain behind
+              a green check for the other).
+
+              autoVerify="true" tells the OS to fetch
+                https://<host>/.well-known/assetlinks.json
+              on install and only route the URL into us if the file lists our
+              package + SHA-256. Until the owner publishes both assetlinks
+              files (see store-assets/assetlinks-*.json + checklist §9a),
+              taps still open the browser — the filter is inert, not broken.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="cefracademy.uz" />
+                <data android:scheme="https" android:host="www.cefracademy.uz" />
+            </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="ieltslevel.uz" />
+                <data android:scheme="https" android:host="www.ieltslevel.uz" />
+            </intent-filter>
+
         </activity>
 
         <provider

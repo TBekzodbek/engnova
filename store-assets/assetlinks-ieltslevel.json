@@ -1,0 +1,65 @@
+/* ------------------------------------------------------------------------
+ * OWNER — read this header, then STRIP IT before uploading.
+ *
+ * Destination:
+ *   https://ieltslevel.uz/.well-known/assetlinks.json
+ *   (must be reachable over HTTPS, MIME type application/json, no redirect)
+ *
+ * The Play Store install-time verifier will fetch that exact URL and only
+ * hand our app ieltslevel.uz taps if the file contains a
+ * "sha256_cert_fingerprints" entry that matches the certificate the
+ * installed APK/AAB was signed with. Wrong fingerprint = silent failure
+ * (browser opens instead of the app, no error surfaced to the user).
+ *
+ * BEFORE UPLOADING:
+ *
+ *   1. Replace <REPLACE_WITH_UPLOAD_KEY_SHA256> below with your upload
+ *      key's SHA-256 fingerprint. Get it from your local keystore:
+ *
+ *        keytool -list -v \
+ *          -keystore android/engnova-upload.jks \
+ *          -alias engnova-upload \
+ *          -storepass "<your-store-password>" | grep SHA256:
+ *
+ *      Format the value as uppercase hex pairs separated by colons, e.g.:
+ *        "A1:B2:C3:D4:E5:F6:...:99"
+ *
+ *      OR — if you have already opted into Play App Signing (recommended,
+ *      and the checklist has you do this at §18) — use the
+ *      "App signing key certificate" SHA-256 fingerprint from
+ *      Play Console → Release → Setup → App integrity. Play resigns the
+ *      installed APK with that key, so it's the fingerprint that ends up
+ *      on the device — assetlinks.json MUST list it, not the upload key.
+ *
+ *      In practice you may want BOTH fingerprints in the array during
+ *      early releases (some testers may install a locally-signed build),
+ *      like: "sha256_cert_fingerprints": ["A1:...", "B2:..."]
+ *
+ *      NOTE: the value MUST match what you put in the cefracademy sibling
+ *      file — same app, same signing key, so same fingerprint on both
+ *      domains. A mismatch is the #1 cause of half-working App Links.
+ *
+ *   2. STRIP THIS ENTIRE COMMENT BLOCK — the `.well-known` file MUST be
+ *      valid JSON on its own. Anything before the opening `[` will make
+ *      the OS verifier reject the file.
+ *
+ *   3. Verify after upload:
+ *        curl -sI https://ieltslevel.uz/.well-known/assetlinks.json
+ *      Expect HTTP/2 200 and Content-Type: application/json.
+ *
+ *      Then on an install of the app:
+ *        adb shell pm get-app-links uz.engnova.app
+ *      Expect the ieltslevel.uz + www.ieltslevel.uz lines to read
+ *      "verified" (not "legacy_failure" or "1024 (verification pending)").
+ * ------------------------------------------------------------------------
+ */
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "uz.engnova.app",
+      "sha256_cert_fingerprints": ["<REPLACE_WITH_UPLOAD_KEY_SHA256>"]
+    }
+  }
+]
