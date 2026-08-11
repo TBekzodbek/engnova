@@ -5,7 +5,8 @@
  * ProductScreen loads that track's live site in the in-app webview.
  *
  * Copy lives in i18n JSON files — this file only carries structure (URLs,
- * blocked-payment patterns, tint tokens) and keys used to look strings up.
+ * host allowlists, path bounce patterns, tint tokens) and keys used to look
+ * strings up.
  *
  * Old inline taglines removed 2026-08-11 (the previous 'IELTS 9.0 gacha
  * tayyorgarlik' violated the no-outcome-guarantees rule and was a Play policy
@@ -37,12 +38,20 @@ export interface TrackDef {
      */
     paymentHosts: string[];
     /**
-     * DEPRECATED (kept for backwards-compat with any surface still reading it).
-     * URL fragments that must NEVER open inside the app webview. Superseded
-     * by the allowedHosts + paymentHosts allowlist above; will be dropped once
-     * every caller migrates.
+     * Path-based bounce patterns: `"host/pathprefix"` entries whose match ALSO
+     * routes to a Chrome Custom Tab, same as paymentHosts. Used to redirect
+     * top-level marketing PRICING pages (which live on our own hosts, so
+     * paymentHosts can't catch them) so a Play reviewer never sees digital-
+     * goods prices rendered inside the app shell. Belt-and-braces on top of
+     * the real defense (Google Play Billing is unavailable in Uzbekistan for
+     * paycom.uz / click.uz, so no policy violation is possible).
+     *
+     * Deliberately does NOT include /dashboard/pricing — that's the in-app
+     * paywall path for expired users; bouncing it would break the renewal
+     * flow. The pay-click on that page already lands on paycom.uz / click.uz,
+     * which paymentHosts bounces out.
      */
-    blockedPatterns: string[];
+    paymentPatterns: string[];
     /** CSS custom-property names for this track's shell tints (defined in globals.css). */
     tint: {
         shell:     string;   // solid, for status bar / progress bar / CTA
@@ -65,7 +74,7 @@ export const TRACKS: Record<Track, TrackDef> = {
         activateUrl: 'https://cefracademy.uz',
         allowedHosts: ['cefracademy.uz', 'supabase.co', 'googleusercontent.com'],
         paymentHosts: ['paycom.uz', 'checkout.paycom.uz', 'click.uz', 'my.click.uz'],
-        blockedPatterns: ['/pricing', 'paycom', 'click.uz'],
+        paymentPatterns: ['cefracademy.uz/pricing'],
         tint: {
             shell:     'var(--track-cefr-shell)',
             shellSoft: 'var(--track-cefr-shell-soft)',
@@ -88,7 +97,13 @@ export const TRACKS: Record<Track, TrackDef> = {
             'click.uz', 'my.click.uz',
             'stripe.com', 'checkout.stripe.com', 'js.stripe.com',
         ],
-        blockedPatterns: ['/pricing', 'stripe.com', 'paycom', 'click.uz'],
+        // Next.js locale routing serves /pricing under each locale prefix,
+        // hence three entries. If a new locale ships, add it here.
+        paymentPatterns: [
+            'ieltslevel.uz/pricing',
+            'ieltslevel.uz/en/pricing',
+            'ieltslevel.uz/ru/pricing',
+        ],
         tint: {
             shell:     'var(--track-ielts-shell)',
             shellSoft: 'var(--track-ielts-shell-soft)',

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ (API 31+) data-extraction posture. Referenced from
+  AndroidManifest.xml android:dataExtractionRules.
+
+  allowBackup="false" on <application> already blocks the LEGACY Auto Backup
+  path on Android 6-11, but on API 31+ device-to-device transfer is a
+  separate channel controlled ONLY by this file. Excluding domain="root"
+  from BOTH cloud-backup AND device-transfer closes the whole surface.
+
+  This is deliberate for an auth-bearing app: WebView cookie jars hold live
+  Supabase session tokens and @capacitor/preferences persists the per-track
+  boot hint. We do NOT want that data restored onto a new device silently
+  when the user signs into the same Google account — forcing a fresh login
+  on a new device is the same UX cefracademy.uz gives you in any browser.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root"        path="." />
+        <exclude domain="database"    path="." />
+        <exclude domain="sharedpref"  path="." />
+        <exclude domain="external"    path="." />
+        <exclude domain="file"        path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root"        path="." />
+        <exclude domain="database"    path="." />
+        <exclude domain="sharedpref"  path="." />
+        <exclude domain="external"    path="." />
+        <exclude domain="file"        path="." />
+    </device-transfer>
+</data-extraction-rules>

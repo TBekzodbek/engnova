@@ -32,9 +32,26 @@ Engnova shell (this repo)
 
 ## Hard rules (Google Play compliance)
 
-- The app **sells nothing** and shows **no prices**. Navigation to any track's
-  `blockedPatterns` (pricing / checkout / payment gateways) never renders inside
-  the app — it's bounced to the **system browser**. Payment happens on the website.
+- The app processes **no in-app payments** for digital goods. Payment gateway
+  hosts (paycom.uz, click.uz, checkout.stripe.com) always bounce OUT to a
+  Chrome Custom Tab via the native plugin — payment **never renders inside
+  the app**. See `TRACKS[t].paymentHosts` in [src/lib/tracks.ts](src/lib/tracks.ts).
+- Top-level marketing **pricing** pages (`cefracademy.uz/pricing`,
+  `ieltslevel.uz/pricing`, and locale-prefixed variants) also bounce to a
+  Custom Tab via `paymentPatterns` — belt-and-braces so a Play reviewer
+  never sees digital-goods prices rendered inside the shell. The real
+  Play-policy defense is regional: Google Play Billing is not available for
+  paycom.uz / click.uz in Uzbekistan, which is why external payment is the
+  only viable path for this app.
+- The in-app renewal path (`/dashboard/pricing` for expired users) is
+  deliberately NOT bounced — its pay-click already hands off to a payment
+  gateway host, which paymentHosts catches, so the outbound flow is the same.
+- WebView remote debugging is gated on the manifest debuggable flag — release
+  builds cannot be `chrome://inspect`-attached, so session tokens stay
+  confidential (`EngnovaWebViewPlugin.java`).
+- `android:allowBackup="false"` + `dataExtractionRules` deny cloud backup AND
+  Android 12+ device-transfer — WebView cookie jars (Supabase session tokens)
+  never leave the device.
 - Capacitor loads the bundled shell (`capacitor.config.ts` has no `server.url`);
   only the *product* content is remote, inside the controlled in-app webview.
 

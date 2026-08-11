@@ -22,11 +22,25 @@ import { TrackNotConfiguredError, getSupabase } from './supabaseClients';
 
 /** Native plugin interface — one file for the whole surface. */
 export interface EngnovaWebViewPlugin {
-    open(opts: { url: string; allowedHosts: string[]; paymentHosts: string[] }): Promise<void>;
+    open(opts: {
+        url: string;
+        allowedHosts: string[];
+        paymentHosts: string[];
+        /** host+path prefixes; a hit bounces to a Chrome Custom Tab identically
+         *  to paymentHosts. Used to route top-level /pricing marketing pages
+         *  out of the shell (Play digital-goods policy belt-and-braces). */
+        paymentPatterns: string[];
+    }): Promise<void>;
     /** Load an inline HTML bootstrap under `baseUrl`. Used by the IELTS handoff
      *  where a tiny page POSTs tokens to /api/auth/native-session from INSIDE
      *  the WebView's cookie jar (so Set-Cookie lands where the site can read it). */
-    loadBootstrapHtml(opts: { baseUrl: string; html: string; allowedHosts: string[]; paymentHosts: string[] }): Promise<void>;
+    loadBootstrapHtml(opts: {
+        baseUrl: string;
+        html: string;
+        allowedHosts: string[];
+        paymentHosts: string[];
+        paymentPatterns: string[];
+    }): Promise<void>;
     close(): Promise<void>;
     goBack(): Promise<{ navigated: boolean }>;
     /** Hard-wipes WebView cookies + Web storage + current WebView cache/history/formData.
@@ -74,9 +88,10 @@ export async function openTrackWebView(track: Track, cb: TrackWebViewCallbacks =
     if (cb.onUrlBlocked) handles.push(await EngnovaWebView.addListener('urlBlocked', cb.onUrlBlocked));
 
     await EngnovaWebView.open({
-        url:            def.url,
-        allowedHosts:   def.allowedHosts,
-        paymentHosts:   def.paymentHosts,
+        url:             def.url,
+        allowedHosts:    def.allowedHosts,
+        paymentHosts:    def.paymentHosts,
+        paymentPatterns: def.paymentPatterns,
     });
 
     return async () => {
@@ -146,9 +161,12 @@ async function refreshedTokens(track: Track): Promise<{ access_token: string; re
         // on its first authenticated fetch and the user thinks the app broke.
         if (data.session.expires_at && data.session.expires_at * 1000 - Date.now() < 60_000) {
             const r = await client.auth.refreshSession({ refresh_token: data.session.refresh_token });
-            if (r.data.session) {
-                return { access_token: r.data.session.access_token, refresh_token: r.data.session.refresh_token };
-            }
+            // On refresh failure return null — do NOT fall through to the stale
+            // token below. openTrackWebViewAuthed's `if (!tokens) return openTrackWebView`
+            // then routes the user to the site's own /login (survivable) instead
+            // of handing the webview a soon-to-401 token (broken authed page).
+            if (!r.data.session) return null;
+            return { access_token: r.data.session.access_token, refresh_token: r.data.session.refresh_token };
         }
         return { access_token: data.session.access_token, refresh_token: data.session.refresh_token };
     } catch (e) {
@@ -186,8 +204,9 @@ export async function openTrackWebViewAuthed(track: Track, cb: TrackWebViewCallb
         const url = `${def.url}/#eng_v=1&eng_at=${at}&eng_rt=${rt}`;
         await EngnovaWebView.open({
             url,
-            allowedHosts: def.allowedHosts,
-            paymentHosts: def.paymentHosts,
+            allowedHosts:    def.allowedHosts,
+            paymentHosts:    def.paymentHosts,
+            paymentPatterns: def.paymentPatterns,
         });
     } else {
         // IELTS: POST-inside-webview bootstrap. loadDataWithBaseURL runs the
@@ -197,8 +216,9 @@ export async function openTrackWebViewAuthed(track: Track, cb: TrackWebViewCallb
         await EngnovaWebView.loadBootstrapHtml({
             baseUrl: def.url + '/',   // trailing slash — some webview versions insist on it
             html,
-            allowedHosts: def.allowedHosts,
-            paymentHosts: def.paymentHosts,
+            allowedHosts:    def.allowedHosts,
+            paymentHosts:    def.paymentHosts,
+            paymentPatterns: def.paymentPatterns,
         });
     }
 

@@ -2,6 +2,7 @@ package uz.engnova.app;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -91,8 +92,16 @@ public class EngnovaWebViewPlugin extends Plugin {
 
     private WebView trackView;
     private PermissionRequest pendingWebRequest;
-    private final List<String> allowedHosts = new ArrayList<>();
-    private final List<String> paymentHosts = new ArrayList<>();
+    // All three lists are only touched on the UI thread (parseHosts is called
+    // from inside the runOnUiThread lambda in open() / loadBootstrapHtml(),
+    // and every reader — shouldOverrideUrlLoading, onPageStarted — is a
+    // WebView callback on the UI thread), so no synchronization is needed.
+    private final List<String> allowedHosts    = new ArrayList<>();
+    private final List<String> paymentHosts    = new ArrayList<>();
+    // Payment PATH patterns: entries are "host/pathprefix", e.g.
+    // "cefracademy.uz/pricing". Matched host-first (subdomain-aware) then
+    // path-startsWith so /pricing, /pricing/foo, /pricing?x=1 all bounce.
+    private final List<String> paymentPatterns = new ArrayList<>();
 
     @Override
     public void load() {
@@ -106,8 +115,14 @@ public class EngnovaWebViewPlugin extends Plugin {
     public void open(final PluginCall call) {
         final String url = call.getString("url");
         if (url == null) { call.reject("missing url"); return; }
-        parseHosts(call);
         getActivity().runOnUiThread(() -> {
+            // parseHosts + createTrackWebView + loadUrl all on the SAME thread,
+            // so the first shouldOverrideUrlLoading callback on the fresh
+            // WebView is guaranteed to see the populated allowlist. Doing
+            // parseHosts on the bridge thread and everything else on UI led
+            // to a torn-read window where first-party navigations were
+            // routed out as 'external'.
+            parseHosts(call);
             closeInternal();
             trackView = createTrackWebView();
             trackView.loadUrl(url);
@@ -135,8 +150,9 @@ public class EngnovaWebViewPlugin extends Plugin {
         final String baseUrl = call.getString("baseUrl");
         final String html    = call.getString("html");
         if (baseUrl == null || html == null) { call.reject("baseUrl and html required"); return; }
-        parseHosts(call);
         getActivity().runOnUiThread(() -> {
+            // Same UI-thread serialization as open() — see comment there.
+            parseHosts(call);
             closeInternal();
             trackView = createTrackWebView();
             // loadDataWithBaseURL treats `html` as if served from `baseUrl`,
@@ -202,11 +218,14 @@ public class EngnovaWebViewPlugin extends Plugin {
     private void parseHosts(PluginCall call) {
         allowedHosts.clear();
         paymentHosts.clear();
-        JSArray a = call.getArray("allowedHosts");
-        JSArray p = call.getArray("paymentHosts");
+        paymentPatterns.clear();
+        JSArray a  = call.getArray("allowedHosts");
+        JSArray p  = call.getArray("paymentHosts");
+        JSArray pp = call.getArray("paymentPatterns");
         try {
-            if (a != null) for (int i = 0; i < a.length(); i++) allowedHosts.add(a.getString(i));
-            if (p != null) for (int i = 0; i < p.length(); i++) paymentHosts.add(p.getString(i));
+            if (a  != null) for (int i = 0; i < a.length();  i++) allowedHosts.add(a.getString(i));
+            if (p  != null) for (int i = 0; i < p.length();  i++) paymentHosts.add(p.getString(i));
+            if (pp != null) for (int i = 0; i < pp.length(); i++) paymentPatterns.add(pp.getString(i));
         } catch (JSONException ignored) { /* absent → empty allowlist → all external */ }
     }
 
@@ -238,8 +257,16 @@ public class EngnovaWebViewPlugin extends Plugin {
         s.setAllowContentAccess(false);
         // UA suffix so the sites can detect they're inside Engnova if they want to.
         s.setUserAgentString(s.getUserAgentString() + " Engnova/1.0");
-        // Debuggable in DevTools during closed-testing; drop before release build.
-        WebView.setWebContentsDebuggingEnabled(true);
+        // Gate DevTools on the manifest debuggable flag (AGP flips it per build
+        // type). Release AAB has debuggable=false → chrome://inspect can never
+        // attach, so session tokens in the WebView stay confidential. Debug
+        // builds still get inspector access for dev work. Using the flag
+        // directly avoids the AGP 8 opt-in dance for BuildConfig generation.
+        boolean debuggable =
+            (getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        if (debuggable) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
 
         wv.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -296,13 +323,32 @@ public class EngnovaWebViewPlugin extends Plugin {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                String host = uri.getHost();
-                if (host == null) return true;
                 String scheme = uri.getScheme() == null ? "" : uri.getScheme();
 
-                // Non-http(s) — tel: / mailto: / sms: / tg: / intent: — hand to system.
+                // Non-http(s) — tel: / mailto: / sms: / tg: / intent: — hand to
+                // the system launcher. Must run BEFORE any host-based check
+                // because opaque URIs (tel:+998…, mailto:foo@bar) have host==null
+                // and would otherwise be swallowed by the guard below.
                 if (!"https".equals(scheme) && !"http".equals(scheme)) {
                     tryStartExternal(uri);
+                    return true;
+                }
+                String host = uri.getHost();
+                if (host == null) return true;
+                String path = uri.getPath();
+
+                // Payment PATH pattern (host+path prefix) → Chrome Custom Tab.
+                // Runs BEFORE the allowedHosts check so /pricing on an allowed
+                // host still routes out — belt-and-braces on Play's digital-
+                // goods policy (the real defense is regional, since Play
+                // Billing isn't offered by paycom.uz / click.uz in Uzbekistan,
+                // but reviewers still look at "are prices rendered in-app?").
+                if (matchesPathPattern(host, path, paymentPatterns)) {
+                    openCustomTab(uri);
+                    JSObject e = new JSObject();
+                    e.put("url", uri.toString());
+                    e.put("reason", "payment");
+                    notifyListeners("urlBlocked", e);
                     return true;
                 }
                 // Payment host → Chrome Custom Tab (shared cookie jar, warm-up capable).
@@ -345,6 +391,31 @@ public class EngnovaWebViewPlugin extends Plugin {
 
     private boolean matches(String host, List<String> patterns) {
         for (String p : patterns) if (host.equals(p) || host.endsWith("." + p)) return true;
+        return false;
+    }
+
+    /**
+     * Match "host/pathprefix" patterns. Host part uses the same
+     * subdomain-aware match as `matches()`; path part is startsWith-with-
+     * boundary so `/pricing` matches `/pricing`, `/pricing/foo`, and
+     * `/pricing?q=1` but NOT `/pricing-guide`.
+     */
+    private boolean matchesPathPattern(String host, String path, List<String> patterns) {
+        if (host == null) return false;
+        String p_ = path == null ? "" : path;
+        for (String pattern : patterns) {
+            int slash = pattern.indexOf('/');
+            if (slash <= 0) continue;  // malformed — must have host AND path
+            String patternHost = pattern.substring(0, slash);
+            String patternPath = pattern.substring(slash);
+            boolean hostOk = host.equals(patternHost) || host.endsWith("." + patternHost);
+            if (!hostOk) continue;
+            if (p_.equals(patternPath)
+                    || p_.startsWith(patternPath + "/")
+                    || p_.startsWith(patternPath + "?")) {
+                return true;
+            }
+        }
         return false;
     }
 

@@ -58,6 +58,16 @@ export default function LoginScreen({ track, onSuccess, onBack }: Props) {
 
     const trackName = t(def.i18n.name);
 
+    // Custom Tab (shared cookie jar) so the user's site session survives the
+    // round-trip if they end up logging in there. Hoisted above the not-
+    // configured branch so both call sites share the same window.open
+    // fallback — a Custom Tab failure on a device without a browser handling
+    // http (corp policy, no default browser) then still lands the user
+    // somewhere useful instead of a silent no-op button.
+    const openInBrowser = (url: string) => {
+        Browser.open({ url }).catch(() => { window.open(url, '_blank', 'noopener,noreferrer'); });
+    };
+
     // ── IELTS not-yet-configured state ─────────────────────────────────────
     // Shown when the IELTS anon key hasn't been set (dev/staging). Falls back
     // gracefully to opening the site in a Custom Tab instead of crashing.
@@ -76,7 +86,7 @@ export default function LoginScreen({ track, onSuccess, onBack }: Props) {
                     <button
                         type="button"
                         className="login-btn login-btn-primary"
-                        onClick={() => Browser.open({ url: def.url })}
+                        onClick={() => openInBrowser(def.url)}
                     >
                         {t('login.ielts.openSite')} <ArrowRight size={16} />
                     </button>
@@ -111,12 +121,6 @@ export default function LoginScreen({ track, onSuccess, onBack }: Props) {
             setBusy(false);
         }
     }
-
-    const openInBrowser = (url: string) => {
-        // Custom Tab (shared cookie jar) so the user's site session survives
-        // the round-trip if they end up logging in there.
-        Browser.open({ url }).catch(() => { window.open(url, '_blank', 'noopener,noreferrer'); });
-    };
 
     return (
         <div className="login" style={tintStyle}>
