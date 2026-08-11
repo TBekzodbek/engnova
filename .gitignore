@@ -9,3 +9,11 @@ ios
 
 # Local machine utility scripts (owner-only, not part of the app)
 *.ps1
+
+# Release signing — the upload keystore + its passwords MUST NEVER leave the
+# owner's machine (losing them = never being able to update the app on Play).
+# The tracked template is `android-overrides/keystore.properties.example`.
+*.jks
+*.keystore
+keystore.properties
+keystore-backups/

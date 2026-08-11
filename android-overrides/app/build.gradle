@@ -1,5 +1,29 @@
 apply plugin: 'com.android.application'
 
+// ── Release signing ──────────────────────────────────────────────────────
+// The upload keystore + its passwords live OUTSIDE version control. This
+// block reads them from `android/keystore.properties` (gitignored via the
+// blanket `android` entry in .gitignore) so the release build can sign.
+//
+// When the file is missing (fresh clone, CI without secrets, or a dev
+// who hasn't set up signing yet) the release config is skipped and
+// `bundleRelease` / `assembleRelease` will fail with a clear "no signing
+// config" error — debug builds are completely unaffected.
+//
+// Setup path: see README.md → "Release build (Play Store)" and
+// scripts/generate-upload-keystore.mjs. Template lives at
+// keystore.properties.example (copied into android/ by the sync script).
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+def hasReleaseSigning = keystorePropertiesFile.exists() &&
+    keystoreProperties['storeFile']     &&
+    keystoreProperties['storePassword'] &&
+    keystoreProperties['keyAlias']      &&
+    keystoreProperties['keyPassword']
+
 android {
     namespace = "uz.engnova.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +40,34 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        // Only registered when the .properties file is present + complete.
+        // Registering an incomplete config would fail even for debug builds.
+        if (hasReleaseSigning) {
+            release {
+                keyAlias      keystoreProperties['keyAlias']
+                keyPassword   keystoreProperties['keyPassword']
+                storeFile     rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                // v1 + v2 + v3 signing so the AAB installs cleanly on every
+                // Android version from API 26 (our minSdk) up through current.
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
+            }
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // R8 shrinking + resource shrinking. The size delta is meaningful
+            // (~40% off the release APK) and the ProGuard rules below keep
+            // everything Capacitor accesses via reflection.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
