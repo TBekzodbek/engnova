@@ -42,13 +42,36 @@ npm run dev        # web preview (native webview no-ops → shows the fallback)
 
 ## Build the Android app (needs the toolchain)
 
-Requires **JDK 17+** and **Android Studio** (SDK/emulator). Then:
+Requires **JDK 21** (Capacitor 8 baseline — every module is compiled at
+`JavaVersion.VERSION_21` + `jvmToolchain(21)`, so JDK 17 fails) and **Android
+Studio** (SDK/emulator). Then:
 
 ```bash
 npx cap add android
-npx cap sync
-npx cap open android   # build / run the APK from Android Studio
 ```
+
+**Post-regen step (required — do this once after every `cap add android`):**
+open `android/variables.gradle` and set:
+
+```
+minSdkVersion = 26
+```
+
+The default Capacitor scaffold writes `24`, but `@capacitor/inappbrowser@4`
+pulls `io.ionic.libs:ioninappbrowser-android:2.0.1`, which declares `minSdk 26`
+— the manifest merger fails with `uses-sdk:minSdkVersion 24 cannot be smaller
+than version 26` otherwise. `android/` is gitignored, so this can't be checked
+in; the note must live here.
+
+Then:
+
+```bash
+npx cap sync
+JAVA_HOME="/c/Program Files/Java/jdk-21" ./android/gradlew -p android assembleDebug
+# APK: android/app/build/outputs/apk/debug/app-debug.apk (~12 MB)
+```
+
+Or, for interactive work, `npx cap open android` and build from Android Studio.
 
 ## Still to do on device (can't be verified in the web preview)
 
