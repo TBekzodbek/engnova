@@ -58,5 +58,40 @@
   "perm.notif.title": "Eslatmalar yoqilsinmi?",
   "perm.notif.body": "Mashg'ulot vaqtida qisqa eslatma yuboramiz. Istalgan payt o'chirasiz.",
   "perm.notif.allow": "Yoqish",
-  "perm.notif.deny": "Hozircha kerak emas"
+  "perm.notif.deny": "Hozircha kerak emas",
+
+  "login.headline": "{trackName}ga kirish",
+  "login.email.label": "Email",
+  "login.email.placeholder": "sizning@email.com",
+  "login.password.label": "Parol",
+  "login.password.show": "Parolni ko'rsatish",
+  "login.password.hide": "Parolni yashirish",
+  "login.submit": "Kirish",
+  "login.submitting": "Kiritilmoqda…",
+  "login.forgot": "Parolni unutdingizmi?",
+  "login.signup.line": "Hali akkauntingiz yo'qmi?",
+  "login.signup.link": "Saytda ro'yxatdan o'ting",
+  "login.google.banner": "Ilgari Google orqali kirgan bo'lsangiz — parolingiz yo'q. \"Parolni unutdingizmi?\" tugmasi orqali email-parol o'rnating.",
+  "login.support": "Yordam kerakmi? engnovaapp@gmail.com",
+  "login.ielts.notReady": "IELTS uchun kirish tez orada ochiladi. Hozircha CEFR ni tanlang yoki ieltslevel.uz saytiga to'g'ridan-to'g'ri o'ting.",
+  "login.ielts.openSite": "Saytda davom etish",
+  "login.back": "Yo'nalishni o'zgartirish",
+
+  "auth.err.invalid_credentials": "Email yoki parol noto'g'ri.",
+  "auth.err.email_not_confirmed": "Email hali tasdiqlanmagan. Pochtangizni tekshiring.",
+  "auth.err.rate_limit": "Juda ko'p urinish. Bir necha daqiqa kuting.",
+  "auth.err.network": "Internet ulanmagan. Aloqani tekshiring va qayta urinib ko'ring.",
+  "auth.err.unknown": "Kirishda xato yuz berdi. Qayta urinib ko'ring.",
+
+  "product.logout": "Chiqish",
+
+  "onboarding.skip": "O'tkazib yuborish",
+  "onboarding.next": "Keyingisi",
+  "onboarding.done": "Boshlaymiz",
+  "onboarding.s1.title": "Ingliz tili — bir joyda",
+  "onboarding.s1.body": "CEFR asosidan C1 gacha. IELTS imtihoniga to'liq tayyorgarlik. Ikkalasi ham bitta ilovada.",
+  "onboarding.s2.title": "Yo'nalishni tanlaysiz",
+  "onboarding.s2.body": "Har bir yo'nalish o'z ustozi, o'z mashqlari va o'z natijalari bilan. Kelajakda o'zgartirasiz.",
+  "onboarding.s3.title": "Mashq. Baholov. O'sish.",
+  "onboarding.s3.body": "Har kuni qisqa mashq — AI baholov — real tayyorgarlik."
 }

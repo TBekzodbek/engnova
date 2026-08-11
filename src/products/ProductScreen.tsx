@@ -17,7 +17,7 @@
  * user is never stranded on a spinner.
  */
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { ArrowLeftRight, ExternalLink, RefreshCw, WifiOff } from 'lucide-react';
+import { ArrowLeftRight, ExternalLink, LogOut, RefreshCw, WifiOff } from 'lucide-react';
 import { TRACKS, type Track } from '../lib/tracks';
 import { isNative, openTrackWebView } from '../lib/webview';
 import { useI18n } from '../i18n';
@@ -29,7 +29,15 @@ type Phase = 'loading' | 'slow' | 'error' | 'offline' | 'webPreview';
 const SLOW_MS  = 4000;
 const TIMEOUT_MS = 10000;
 
-export default function ProductScreen({ track, onSwitchTrack }: { track: Track; onSwitchTrack: () => void }) {
+interface ProductScreenProps {
+    track: Track;
+    onSwitchTrack: () => void;
+    /** Native log-out — invalidates the SDK session, wipes WebView cookies,
+     *  clears the boot-hint. App.tsx transitions back to LoginScreen. */
+    onLogout: () => void;
+}
+
+export default function ProductScreen({ track, onSwitchTrack, onLogout }: ProductScreenProps) {
     const def = TRACKS[track];
     const { t } = useI18n();
     const [native] = useState(isNative);
@@ -105,15 +113,26 @@ export default function ProductScreen({ track, onSwitchTrack }: { track: Track; 
         <div className="pscreen" style={tintStyle}>
             <header className="pscreen-topbar">
                 <div className="pscreen-name">{trackName}</div>
-                <button
-                    type="button"
-                    className="pscreen-switch"
-                    onClick={() => setConfirmingSwitch(true)}
-                    aria-label={t('switch.button.long')}
-                >
-                    <ArrowLeftRight size={14} aria-hidden="true" />
-                    <span className="pscreen-switch-label">{t('switch.button.short')}</span>
-                </button>
+                <div className="pscreen-actions">
+                    <button
+                        type="button"
+                        className="pscreen-switch"
+                        onClick={() => setConfirmingSwitch(true)}
+                        aria-label={t('switch.button.long')}
+                    >
+                        <ArrowLeftRight size={14} aria-hidden="true" />
+                        <span className="pscreen-switch-label">{t('switch.button.short')}</span>
+                    </button>
+                    <button
+                        type="button"
+                        className="pscreen-logout"
+                        onClick={onLogout}
+                        aria-label={t('product.logout')}
+                        title={t('product.logout')}
+                    >
+                        <LogOut size={14} aria-hidden="true" />
+                    </button>
+                </div>
             </header>
 
             {(phase === 'loading' || phase === 'slow') && (

@@ -28,6 +28,35 @@
     letter-spacing: -0.005em;
 }
 
+.pscreen-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pscreen-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--color-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-full);
+    transition:
+        background var(--motion-fast) var(--ease),
+        color var(--motion-fast) var(--ease),
+        border-color var(--motion-fast) var(--ease),
+        transform var(--motion-fast) var(--ease);
+}
+.pscreen-logout:hover:not(:disabled) {
+    background: var(--color-surface-hi);
+    color: var(--color-danger);
+    border-color: var(--color-line-hi);
+}
+.pscreen-logout:active { transform: scale(0.94); }
+
 .pscreen-switch {
     display: inline-flex;
     align-items: center;

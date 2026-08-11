@@ -58,5 +58,40 @@
   "perm.notif.title": "Turn on reminders?",
   "perm.notif.body": "We'll send a short reminder for your practice. You can turn it off any time.",
   "perm.notif.allow": "Turn on",
-  "perm.notif.deny": "Not now"
+  "perm.notif.deny": "Not now",
+
+  "login.headline": "Sign in to {trackName}",
+  "login.email.label": "Email",
+  "login.email.placeholder": "you@email.com",
+  "login.password.label": "Password",
+  "login.password.show": "Show password",
+  "login.password.hide": "Hide password",
+  "login.submit": "Sign in",
+  "login.submitting": "Signing in…",
+  "login.forgot": "Forgot password?",
+  "login.signup.line": "No account yet?",
+  "login.signup.link": "Sign up on the website",
+  "login.google.banner": "Signed up with Google before? You don't have a password yet. Use 'Forgot password' to set one for email sign-in.",
+  "login.support": "Need help? engnovaapp@gmail.com",
+  "login.ielts.notReady": "IELTS sign-in is opening soon. For now, pick CEFR or go straight to ieltslevel.uz.",
+  "login.ielts.openSite": "Continue on the site",
+  "login.back": "Switch track",
+
+  "auth.err.invalid_credentials": "Wrong email or password.",
+  "auth.err.email_not_confirmed": "Email not confirmed yet. Check your inbox.",
+  "auth.err.rate_limit": "Too many attempts. Wait a few minutes.",
+  "auth.err.network": "No internet connection. Check your network and try again.",
+  "auth.err.unknown": "Sign-in error. Please try again.",
+
+  "product.logout": "Log out",
+
+  "onboarding.skip": "Skip",
+  "onboarding.next": "Next",
+  "onboarding.done": "Let's begin",
+  "onboarding.s1.title": "English, in one place",
+  "onboarding.s1.body": "CEFR from the ground up to C1. Full IELTS exam prep. Both tracks in one app.",
+  "onboarding.s2.title": "You pick the track",
+  "onboarding.s2.body": "Each track has its own coach, its own exercises, its own results. You can switch later.",
+  "onboarding.s3.title": "Practice. Feedback. Growth.",
+  "onboarding.s3.body": "Short practice every day — AI feedback — real preparation."
 }

@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.view.ViewGroup;
+import android.webkit.CookieManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
+import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -99,6 +101,34 @@ public class EngnovaWebViewPlugin extends Plugin {
         getActivity().runOnUiThread(() -> {
             closeInternal();
             if (call != null) call.resolve();
+        });
+    }
+
+    /**
+     * Hard-wipes WebView cookies + Web storage. Called on logout so the next
+     * login for a DIFFERENT user on the same device doesn't inherit the
+     * previous user's session cookies from the site.
+     *
+     * If a WebView is currently mounted, also clears its per-instance cache
+     * + history + form data. Runs on the UI thread — Cookie/WebStorage APIs
+     * are process-global and thread-safe but we serialize the WebView calls.
+     */
+    @PluginMethod
+    public void clearData(final PluginCall call) {
+        getActivity().runOnUiThread(() -> {
+            try {
+                CookieManager.getInstance().removeAllCookies(null);
+                CookieManager.getInstance().flush();
+            } catch (Exception ignored) { /* API missing on ancient WebView — swallow */ }
+            try {
+                WebStorage.getInstance().deleteAllData();
+            } catch (Exception ignored) {}
+            if (trackView != null) {
+                try { trackView.clearCache(true); }  catch (Exception ignored) {}
+                try { trackView.clearHistory(); }    catch (Exception ignored) {}
+                try { trackView.clearFormData(); }   catch (Exception ignored) {}
+            }
+            call.resolve();
         });
     }
 

@@ -58,5 +58,40 @@
   "perm.notif.title": "Включить напоминания?",
   "perm.notif.body": "Пришлём короткое напоминание к вашему занятию. Отключить можно в любой момент.",
   "perm.notif.allow": "Включить",
-  "perm.notif.deny": "Не сейчас"
+  "perm.notif.deny": "Не сейчас",
+
+  "login.headline": "Вход в {trackName}",
+  "login.email.label": "Email",
+  "login.email.placeholder": "ваш@email.com",
+  "login.password.label": "Пароль",
+  "login.password.show": "Показать пароль",
+  "login.password.hide": "Скрыть пароль",
+  "login.submit": "Войти",
+  "login.submitting": "Входим…",
+  "login.forgot": "Забыли пароль?",
+  "login.signup.line": "Ещё нет аккаунта?",
+  "login.signup.link": "Зарегистрируйтесь на сайте",
+  "login.google.banner": "Если раньше входили через Google — у вас нет пароля. Через «Забыли пароль?» задайте пароль для входа по email.",
+  "login.support": "Нужна помощь? engnovaapp@gmail.com",
+  "login.ielts.notReady": "Вход в IELTS скоро откроется. Пока выберите CEFR или перейдите на ieltslevel.uz напрямую.",
+  "login.ielts.openSite": "Продолжить на сайте",
+  "login.back": "Сменить направление",
+
+  "auth.err.invalid_credentials": "Неверный email или пароль.",
+  "auth.err.email_not_confirmed": "Email ещё не подтверждён. Проверьте почту.",
+  "auth.err.rate_limit": "Слишком много попыток. Подождите несколько минут.",
+  "auth.err.network": "Нет подключения к интернету. Проверьте связь и попробуйте снова.",
+  "auth.err.unknown": "Ошибка входа. Попробуйте снова.",
+
+  "product.logout": "Выйти",
+
+  "onboarding.skip": "Пропустить",
+  "onboarding.next": "Далее",
+  "onboarding.done": "Начнём",
+  "onboarding.s1.title": "Английский — в одном месте",
+  "onboarding.s1.body": "CEFR от основ до C1. Полная подготовка к IELTS. Оба направления в одном приложении.",
+  "onboarding.s2.title": "Вы выбираете направление",
+  "onboarding.s2.body": "У каждого — свой наставник, свои задания, свои результаты. Направление можно сменить позже.",
+  "onboarding.s3.title": "Практика. Оценка. Рост.",
+  "onboarding.s3.body": "Короткая практика каждый день — оценка от ИИ — настоящая подготовка."
 }

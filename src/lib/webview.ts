@@ -24,6 +24,9 @@ export interface EngnovaWebViewPlugin {
     open(opts: { url: string; allowedHosts: string[]; paymentHosts: string[] }): Promise<void>;
     close(): Promise<void>;
     goBack(): Promise<{ navigated: boolean }>;
+    /** Hard-wipes WebView cookies + Web storage + current WebView cache/history/formData.
+     *  Called on logout so the next login isn't silently the previous user. */
+    clearData(): Promise<void>;
     addListener(event: 'progress',   cb: (e: { value: number }) => void): Promise<PluginListenerHandle>;
     addListener(event: 'error',      cb: (e: { code: number; description: string; url: string }) => void): Promise<PluginListenerHandle>;
     addListener(event: 'urlBlocked', cb: (e: { url: string; reason: 'payment' | 'external' }) => void): Promise<PluginListenerHandle>;
@@ -85,4 +88,13 @@ export async function webViewGoBack(): Promise<boolean> {
     } catch {
         return false;
     }
+}
+
+/**
+ * Wipe the WebView's cookies + Web storage. Safe to call on web preview
+ * (the stub plugin no-ops). Fire on logout so the next user on the same
+ * device isn't silently the previous one.
+ */
+export async function clearTrackWebViewStorage(): Promise<void> {
+    try { await EngnovaWebView.clearData(); } catch { /* web preview / plugin missing */ }
 }
