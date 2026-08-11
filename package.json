@@ -12,6 +12,7 @@
     "cap:android": "npm run build && npx cap sync android && npm run sync:android",
     "keystore:generate": "node scripts/generate-upload-keystore.mjs",
     "graphics:export": "node scripts/export-store-graphics.mjs",
+    "screenshots:capture": "node scripts/capture-screenshots.mjs",
     "build:apk:debug": "npm run cap:android && cd android && gradlew.bat assembleDebug",
     "build:apk:release": "npm run cap:android && cd android && gradlew.bat assembleRelease",
     "build:aab": "npm run cap:android && cd android && gradlew.bat bundleRelease"
@@ -32,6 +33,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "puppeteer-core": "^25.6.0",
     "sharp": "^0.35.3",
     "typescript": "~6.0.2",
     "vite": "^8.0.12"

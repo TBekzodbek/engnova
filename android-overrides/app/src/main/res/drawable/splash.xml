@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Base fallback for the legacy Capacitor `@drawable/splash` reference.
+  We use the Android 12+ SplashScreen API (windowSplashScreenBackground +
+  windowSplashScreenAnimatedIcon in AppTheme.NoActionBarLaunch), so this
+  drawable is never actually shown — but Capacitor's scaffold ships 10
+  density-qualified splash.png files (drawable-port-hdpi through
+  drawable-land-xxxhdpi) with no base declaration, which fails
+  lintVitalRelease with MissingDefaultResource.
+
+  This VectorDrawable satisfies the base declaration. Solid dark bg
+  matching the splash color (values/colors.xml splash_bg). Weighs ~200 bytes.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#08080C"
+        android:pathData="M0,0 H24 V24 H0 Z" />
+</vector>
