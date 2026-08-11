@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Engnova">
+  <!--
+    Engnova app icon — "Northstar Neon".
+    Layered from back to front:
+      1. Deep near-black background (rounded square)
+      2. Halo — radial gradient white -> indigo -> cyan -> transparent (chromatic)
+      3. Bloom — second radial with more spread, indigo-tinted
+      4. Spark rays — 4 diagonal thin lines cutting through the halo
+      5. Star — 4-point directional star, bright core with subtle inner gradient
+      6. Tiny inner sparkle at the star's exact centre — the neon "hot spot"
+    Every element has been baked as a static "peak animation frame" for the
+    launcher icon; the animated variant (icon-animated.svg) breathes.
+  -->
+  <defs>
+    <!-- Deep near-black background -->
+    <linearGradient id="ic-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   stop-color="#0B0B18"/>
+      <stop offset="0.6" stop-color="#08081A"/>
+      <stop offset="1"   stop-color="#050514"/>
+    </linearGradient>
+
+    <!-- Halo: bright-white core, indigo mid, cyan outer, fades to transparent -->
+    <radialGradient id="ic-halo" cx="0.5" cy="0.46" r="0.55">
+      <stop offset="0"    stop-color="#F5F8FF" stop-opacity="0.95"/>
+      <stop offset="0.10" stop-color="#C7C8FF" stop-opacity="0.85"/>
+      <stop offset="0.28" stop-color="#7B72EE" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#4136C4" stop-opacity="0.30"/>
+      <stop offset="0.85" stop-color="#1EA8FF" stop-opacity="0.10"/>
+      <stop offset="1"    stop-color="#1EA8FF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bloom: wider indigo aura underneath -->
+    <radialGradient id="ic-bloom" cx="0.5" cy="0.46" r="0.75">
+      <stop offset="0"   stop-color="#554BE7" stop-opacity="0.55"/>
+      <stop offset="0.4" stop-color="#554BE7" stop-opacity="0.15"/>
+      <stop offset="1"   stop-color="#554BE7" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Star face: near-white with a tiny cyan tint at bottom-right -->
+    <linearGradient id="ic-star" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0"   stop-color="#FFFFFF"/>
+      <stop offset="0.7" stop-color="#E9ECFF"/>
+      <stop offset="1"   stop-color="#C7D6FF"/>
+    </linearGradient>
+
+    <!-- Hot spot at the star's centre -->
+    <radialGradient id="ic-hotspot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0"   stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="1"   stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 1. Background -->
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#ic-bg)"/>
+
+  <!-- 2. Bloom (wide, soft) — behind everything -->
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#ic-bloom)"/>
+
+  <!-- 3. Halo (bright chromatic disc) -->
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#ic-halo)"/>
+
+  <!-- 4. Spark rays — 4 diagonal thin lines through the halo -->
+  <g stroke="#FFFFFF" stroke-linecap="round" opacity="0.55">
+    <!-- Top-left to bottom-right -->
+    <line x1="120" y1="120" x2="392" y2="392" stroke-width="1.6" opacity="0.35"/>
+    <!-- Top-right to bottom-left -->
+    <line x1="392" y1="120" x2="120" y2="392" stroke-width="1.6" opacity="0.35"/>
+  </g>
+
+  <!-- 5. Star — 4-point directional. Center (256, 236), Ro=145, Ri=58 (2.5:1). -->
+  <!-- Faint outer glow ring around the star, drawn as a stroked, blurred-look path -->
+  <path
+    d="M 256 91 L 297.01 194.99 L 401 236 L 297.01 277.01 L 256 381 L 214.99 277.01 L 111 236 L 214.99 194.99 Z"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="6"
+    stroke-linejoin="round"
+    opacity="0.15"/>
+
+  <path
+    d="M 256 91 L 297.01 194.99 L 401 236 L 297.01 277.01 L 256 381 L 214.99 277.01 L 111 236 L 214.99 194.99 Z"
+    fill="url(#ic-star)"
+    stroke="#FFFFFF"
+    stroke-width="1.5"
+    stroke-linejoin="round"/>
+
+  <!-- 6. Hot spot at the star's exact centre — the neon "electron" -->
+  <circle cx="256" cy="236" r="26" fill="url(#ic-hotspot)"/>
+
+  <!-- Tiny high-contrast core dot for extra crispness at large sizes -->
+  <circle cx="256" cy="236" r="4" fill="#FFFFFF"/>
+</svg>

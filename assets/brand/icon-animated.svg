@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Engnova">
+  <!--
+    Animated variant of icon-full.svg — for the splash screen, chooser hero,
+    or any in-app surface that can afford motion. Uses SMIL (works in every
+    modern WebView + browser). Three interlocking loops:
+      1. halo scales 0.98 → 1.02 → 0.98 over 2.8 s   (breath)
+      2. sparks-group rotates 360° over 24 s          (slow drift)
+      3. hot-spot fades 0.75 → 1 → 0.75 over 3.2 s    (electron twinkle)
+    All timings are prime-relative so the animation never syncs into a
+    metronome — it stays organically alive.
+  -->
+  <defs>
+    <linearGradient id="ic-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   stop-color="#0B0B18"/>
+      <stop offset="0.6" stop-color="#08081A"/>
+      <stop offset="1"   stop-color="#050514"/>
+    </linearGradient>
+    <radialGradient id="ic-halo" cx="0.5" cy="0.46" r="0.55">
+      <stop offset="0"    stop-color="#F5F8FF" stop-opacity="0.95"/>
+      <stop offset="0.10" stop-color="#C7C8FF" stop-opacity="0.85"/>
+      <stop offset="0.28" stop-color="#7B72EE" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#4136C4" stop-opacity="0.30"/>
+      <stop offset="0.85" stop-color="#1EA8FF" stop-opacity="0.10"/>
+      <stop offset="1"    stop-color="#1EA8FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ic-bloom" cx="0.5" cy="0.46" r="0.75">
+      <stop offset="0"   stop-color="#554BE7" stop-opacity="0.55"/>
+      <stop offset="0.4" stop-color="#554BE7" stop-opacity="0.15"/>
+      <stop offset="1"   stop-color="#554BE7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ic-star" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0"   stop-color="#FFFFFF"/>
+      <stop offset="0.7" stop-color="#E9ECFF"/>
+      <stop offset="1"   stop-color="#C7D6FF"/>
+    </linearGradient>
+    <radialGradient id="ic-hotspot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0"   stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="1"   stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#ic-bg)"/>
+
+  <!-- Bloom (breath) -->
+  <g transform-origin="256 236">
+    <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#ic-bloom)"/>
+    <animateTransform attributeName="transform" type="scale"
+      values="0.97;1.03;0.97" keyTimes="0;0.5;1"
+      dur="2.8s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"
+      repeatCount="indefinite"/>
+  </g>
+
+  <!-- Halo (also breathes but on a different phase) -->
+  <g transform-origin="256 236">
+    <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#ic-halo)"/>
+    <animate attributeName="opacity" values="0.85;1;0.85" keyTimes="0;0.5;1"
+      dur="2.8s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"
+      repeatCount="indefinite"/>
+  </g>
+
+  <!-- Spark rays — slowly rotate around the star centre -->
+  <g stroke="#FFFFFF" stroke-linecap="round" transform-origin="256 236">
+    <line x1="120" y1="120" x2="392" y2="392" stroke-width="1.6" opacity="0.35"/>
+    <line x1="392" y1="120" x2="120" y2="392" stroke-width="1.6" opacity="0.35"/>
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 256 236" to="360 256 236" dur="24s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Star outer glow ring -->
+  <path
+    d="M 256 91 L 297.01 194.99 L 401 236 L 297.01 277.01 L 256 381 L 214.99 277.01 L 111 236 L 214.99 194.99 Z"
+    fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round" opacity="0.15"/>
+
+  <!-- Star -->
+  <path
+    d="M 256 91 L 297.01 194.99 L 401 236 L 297.01 277.01 L 256 381 L 214.99 277.01 L 111 236 L 214.99 194.99 Z"
+    fill="url(#ic-star)" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- Hot spot (twinkle) -->
+  <circle cx="256" cy="236" r="26" fill="url(#ic-hotspot)">
+    <animate attributeName="opacity" values="0.75;1;0.75" keyTimes="0;0.5;1"
+      dur="3.2s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Crisp core dot -->
+  <circle cx="256" cy="236" r="4" fill="#FFFFFF"/>
+</svg>

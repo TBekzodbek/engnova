@@ -16,13 +16,18 @@ in a full-screen in-app webview.
 
 ```
 Engnova shell (this repo)
-├── ChooserScreen        CEFR | IELTS  (remembered, switchable)
-├── lib/tracks.ts        track defs: live url, activate url, blocked payment patterns
-├── lib/webview.ts       opens the track's site in @capacitor/inappbrowser;
-│                        a blocked (pricing/checkout) URL is bounced OUT to the
-│                        system browser (@capacitor/browser)
-└── products/
-    └── ProductScreen.tsx  native → in-app webview; web preview → open-site fallback
+├── src/
+│   ├── design/tokens.ts       colors / radii / motion / type (single source of truth)
+│   ├── styles/globals.css     tokens as CSS custom properties (dark+light)
+│   ├── i18n/                  UZ default + RU + EN; ready-to-paste key spine
+│   ├── lib/tracks.ts          track defs: live URL, blocked payment patterns, tint tokens
+│   ├── lib/webview.ts         opens the site in @capacitor/inappbrowser; blocked URL
+│   │                          → bounced OUT to the system browser (@capacitor/browser)
+│   ├── screens/ChooserScreen  hero + subhead + rich track cards + language chip
+│   ├── products/ProductScreen loading / slow / error / offline / web-preview states
+│   └── components/            LanguageChip, LanguageSheet, ConfirmDialog
+├── assets/brand/              source-of-truth icon SVGs (see "App icon" below)
+└── android-overrides/         native customizations mirrored → android/ (see "Android" below)
 ```
 
 ## Hard rules (Google Play compliance)
@@ -40,41 +45,68 @@ npm install
 npm run dev        # web preview (native webview no-ops → shows the fallback)
 ```
 
-## Build the Android app (needs the toolchain)
+## Building the Android app
 
 Requires **JDK 21** (Capacitor 8 baseline — every module is compiled at
 `JavaVersion.VERSION_21` + `jvmToolchain(21)`, so JDK 17 fails) and **Android
-Studio** (SDK/emulator). Then:
+Studio** (SDK/emulator).
+
+### First-time setup (from a fresh clone or after deleting `android/`)
 
 ```bash
-npx cap add android
+npx cap add android          # capacitor scaffolds the default android/ folder
+npm run sync:android         # copies our native customizations from android-overrides/ → android/
 ```
 
-**Post-regen step (required — do this once after every `cap add android`):**
-open `android/variables.gradle` and set:
+`npm run sync:android` restores every file we've customized on top of Capacitor's
+scaffold: the neon adaptive app icon (foreground + background + monochrome), the
+Android 12+ SplashScreen theme, the splash icon drawable, the notification icon,
+the `minSdkVersion=26` bump (required by `@capacitor/inappbrowser@4`), and the
+MainActivity SplashScreen wiring.
 
-```
-minSdkVersion = 26
-```
+**Why the mirror pattern:** `android/` is gitignored (Capacitor convention — the
+folder is largely generated). But we still need our native customizations under
+source control. `android-overrides/` is the tracked source of truth; the sync
+script copies files at their exact relative paths into `android/`. Idempotent —
+re-runs are no-ops when files are identical. See `scripts/apply-android-overrides.mjs`.
 
-The default Capacitor scaffold writes `24`, but `@capacitor/inappbrowser@4`
-pulls `io.ionic.libs:ioninappbrowser-android:2.0.1`, which declares `minSdk 26`
-— the manifest merger fails with `uses-sdk:minSdkVersion 24 cannot be smaller
-than version 26` otherwise. `android/` is gitignored, so this can't be checked
-in; the note must live here.
-
-Then:
+### Everyday build
 
 ```bash
-npx cap sync
+npm run cap:android          # web build + capacitor sync + apply overrides
 JAVA_HOME="/c/Program Files/Java/jdk-21" ./android/gradlew -p android assembleDebug
 # APK: android/app/build/outputs/apk/debug/app-debug.apk (~12 MB)
 ```
 
 Or, for interactive work, `npx cap open android` and build from Android Studio.
 
+## App icon — "Northstar Neon"
+
+Source SVGs in `assets/brand/`:
+
+- `icon-full.svg` — static 512×512 peak-frame (used as the launcher icon)
+- `icon-animated.svg` — SMIL-animated variant (in-app splash / hero)
+- `icon-monochrome.svg` — silhouette (Android 13+ themed icons + notifications)
+
+Wired into Android as VectorDrawables under `android-overrides/app/src/main/res/`:
+
+- `drawable/ic_launcher_background.xml`  bg gradient + bloom + halo
+- `drawable/ic_launcher_foreground.xml`  spark rays + star + hot spot
+- `drawable/ic_launcher_monochrome.xml`  Material You themed icon
+- `drawable/ic_splash.xml`               splash screen mark (transparent bg)
+- `drawable/ic_notification.xml`         24dp status-bar silhouette
+- `mipmap-anydpi-v26/ic_launcher.xml`    adaptive-icon spec (fg + bg + mono)
+- `mipmap-anydpi-v26/ic_launcher_round.xml`  same for round-icon launchers
+
+**512×512 Play Store icon PNG** — export once from `assets/brand/icon-full.svg`
+via any SVG-to-PNG tool (e.g. `magick -density 300 icon-full.svg -resize 512x512 icon-512.png`
+or a browser screenshot at 512 zoom). No alpha. Sits at `store-assets/icon-512.png`.
+
 ## Still to do on device (can't be verified in the web preview)
 
-- Tune the in-app webview options + the payment-route interception against real navigation.
-- Android permissions for the microphone (speaking/pronunciation/shadowing).
-- Push notifications (FCM), app icon/splash, then Play closed-testing.
+- Rip out `@capacitor/inappbrowser` in favour of a custom bridge WebView plugin
+  (unblocks microphone / hardware-back / URL-allowlist / real error events).
+- Android permissions for microphone (speaking practice on both tracks).
+- Push notifications (FCM) + deep-link intent filters (App Links).
+- Play closed testing (needs 12 opted-in testers × 14 continuous days for
+  personal-account first submission).

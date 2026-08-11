@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme (post-splash) -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <!--
+        Launch theme — Android 12+ SplashScreen API (androidx.core.splashscreen
+        is already on the classpath). Renders a solid dark background with the
+        neon icon centred; the theme flips to AppTheme.NoActionBar the moment
+        the app's first frame is drawn.
+
+        windowSplashScreenBackground   — solid colour (matches the icon's own bg).
+        windowSplashScreenAnimatedIcon — the neon mark (static v1; can be
+                                         upgraded to an AnimatedVectorDrawable later).
+        postSplashScreenTheme          — theme to swap in after splash dismisses.
+
+        The old @drawable/splash PNG is retired — we keep the file so Capacitor's
+        JS splash plugin (if reintroduced) doesn't crash referencing it.
+    -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>

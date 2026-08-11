@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Splash-screen icon (Android 12+ SplashScreen API).
+    The API renders this drawable inside a ~160dp circle mask centred on
+    screen. Transparent bg (the splash's own windowSplashScreenBackground
+    fills behind it). Full neon mark: bloom, halo, spark rays, star, hot spot.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Bloom (indigo aura) -->
+    <path android:pathData="M0,0 h108 v108 h-108 z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54" android:centerY="49.7"
+                android:gradientRadius="80">
+                <item android:offset="0"   android:color="#8C554BE7"/>
+                <item android:offset="0.4" android:color="#26554BE7"/>
+                <item android:offset="1"   android:color="#00554BE7"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Halo (chromatic disc) -->
+    <path android:pathData="M0,0 h108 v108 h-108 z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54" android:centerY="49.7"
+                android:gradientRadius="60">
+                <item android:offset="0"    android:color="#F2F5F8FF"/>
+                <item android:offset="0.10" android:color="#D9C7C8FF"/>
+                <item android:offset="0.28" android:color="#8C7B72EE"/>
+                <item android:offset="0.55" android:color="#4C4136C4"/>
+                <item android:offset="0.85" android:color="#1A1EA8FF"/>
+                <item android:offset="1"    android:color="#001EA8FF"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Spark rays -->
+    <path
+        android:pathData="M25.3,25.3 L82.7,82.7"
+        android:strokeColor="#59FFFFFF" android:strokeWidth="0.34" android:strokeLineCap="round"/>
+    <path
+        android:pathData="M82.7,25.3 L25.3,82.7"
+        android:strokeColor="#59FFFFFF" android:strokeWidth="0.34" android:strokeLineCap="round"/>
+
+    <!-- Star outer glow ring -->
+    <path
+        android:pathData="M54,22 L61.64,41.36 L81,49 L61.64,56.64 L54,76 L46.36,56.64 L27,49 L46.36,41.36 Z"
+        android:strokeColor="#26FFFFFF" android:strokeWidth="1.27" android:strokeLineJoin="round"/>
+
+    <!-- Star face -->
+    <path
+        android:pathData="M54,22 L61.64,41.36 L81,49 L61.64,56.64 L54,76 L46.36,56.64 L27,49 L46.36,41.36 Z"
+        android:strokeColor="#FFFFFFFF" android:strokeWidth="0.32" android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="27" android:startY="22"
+                android:endX="76"  android:endY="76">
+                <item android:offset="0"   android:color="#FFFFFFFF"/>
+                <item android:offset="0.7" android:color="#FFE9ECFF"/>
+                <item android:offset="1"   android:color="#FFC7D6FF"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Hot spot -->
+    <path android:pathData="M48.5,49 A5.5,5.5 0 1,0 59.5,49 A5.5,5.5 0 1,0 48.5,49 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54" android:centerY="49"
+                android:gradientRadius="5.5">
+                <item android:offset="0"   android:color="#FFFFFFFF"/>
+                <item android:offset="0.5" android:color="#99FFFFFF"/>
+                <item android:offset="1"   android:color="#00FFFFFF"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Crisp centre dot -->
+    <path
+        android:pathData="M53.1,49 A0.9,0.9 0 1,0 54.9,49 A0.9,0.9 0 1,0 53.1,49 Z"
+        android:fillColor="#FFFFFFFF"/>
+</vector>

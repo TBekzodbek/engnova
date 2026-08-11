@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108" role="img" aria-label="Engnova">
+  <!--
+    Monochrome adaptive icon (Android 13+ Material You themed icons) +
+    notification icon reference. Pure silhouette — the launcher / status bar
+    tints it based on user theme.
+
+    4-point directional star, center (54, 49) (4% above canvas center for
+    the "rising" feel), outer radius 27, inner radius 10.8 (2.5:1).
+    All content stays inside the 66dp safe-zone circle centered at (54, 54).
+  -->
+  <path fill="#FFFFFF"
+    d="M 54 22 L 61.64 41.36 L 81 49 L 61.64 56.64 L 54 76 L 46.36 56.64 L 27 49 L 46.36 41.36 Z"/>
+  <!-- Small crisp core so the icon reads as "light source" even at 24dp -->
+  <circle cx="54" cy="49" r="1.5" fill="#FFFFFF"/>
+</svg>

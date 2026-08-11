@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Engnova adaptive icon — monochrome (Material You themed icon, Android 13+).
+    Pure silhouette. Launcher tints the whole thing to match user's wallpaper theme.
+    Same star geometry as the foreground; centre dot kept for "light source" feel.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M54,22 L61.64,41.36 L81,49 L61.64,56.64 L54,76 L46.36,56.64 L27,49 L46.36,41.36 Z"
+        android:fillColor="#FFFFFFFF"/>
+    <path
+        android:pathData="M52.5,49 A1.5,1.5 0 1,0 55.5,49 A1.5,1.5 0 1,0 52.5,49 Z"
+        android:fillColor="#FFFFFFFF"/>
+</vector>

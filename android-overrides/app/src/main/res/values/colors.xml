@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash screen background — matches the icon's own near-black background
+         so the splash → icon transition is seamless. -->
+    <color name="splash_bg">#08080C</color>
+
+    <!-- Retained for backwards compatibility with the old color-based launcher
+         background reference; the new adaptive icon uses @drawable/ic_launcher_background instead. -->
+    <color name="colorPrimary">#5B50E8</color>
+    <color name="colorPrimaryDark">#4136C4</color>
+    <color name="colorAccent">#7B72EE</color>
+</resources>

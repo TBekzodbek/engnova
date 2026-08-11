@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Engnova notification icon (Android silhouettes it to white on the status bar).
+    24dp canvas, star scaled to fit with 2dp padding. Same silhouette as the
+    monochrome adaptive foreground so the notification and the app icon read
+    as the same brand.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Star: centre (12, 11), Ro=8, Ri=3.2 -->
+    <path
+        android:pathData="M12,3 L14.26,9.74 L21,12 L14.26,14.26 L12,21 L9.74,14.26 L3,12 L9.74,9.74 Z"
+        android:fillColor="#FFFFFFFF"/>
+    <path
+        android:pathData="M11.5,12 A0.5,0.5 0 1,0 12.5,12 A0.5,0.5 0 1,0 11.5,12 Z"
+        android:fillColor="#FFFFFFFF"/>
+</vector>
