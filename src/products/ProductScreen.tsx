@@ -19,7 +19,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowLeftRight, ExternalLink, LogOut, RefreshCw, WifiOff } from 'lucide-react';
 import { TRACKS, type Track } from '../lib/tracks';
-import { isNative, openTrackWebView } from '../lib/webview';
+import { isNative, openTrackWebViewAuthed } from '../lib/webview';
 import { useI18n } from '../i18n';
 import ConfirmDialog from '../components/ConfirmDialog';
 import './ProductScreen.css';
@@ -64,7 +64,7 @@ export default function ProductScreen({ track, onSwitchTrack, onLogout }: Produc
         slowTimer.current = setTimeout(() => { if (!disposed) setPhase(p => p === 'loading' ? 'slow' : p); }, SLOW_MS);
         failTimer.current = setTimeout(() => { if (!disposed) setPhase(p => (p === 'loading' || p === 'slow') ? 'error' : p); }, TIMEOUT_MS);
 
-        openTrackWebView(track, {
+        openTrackWebViewAuthed(track, {
             onProgress: (value) => {
                 if (disposed) return;
                 if (value >= 85) {

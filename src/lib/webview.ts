@@ -18,10 +18,15 @@
  */
 import { Capacitor, registerPlugin, type PluginListenerHandle } from '@capacitor/core';
 import { TRACKS, type Track } from './tracks';
+import { TrackNotConfiguredError, getSupabase } from './supabaseClients';
 
 /** Native plugin interface — one file for the whole surface. */
 export interface EngnovaWebViewPlugin {
     open(opts: { url: string; allowedHosts: string[]; paymentHosts: string[] }): Promise<void>;
+    /** Load an inline HTML bootstrap under `baseUrl`. Used by the IELTS handoff
+     *  where a tiny page POSTs tokens to /api/auth/native-session from INSIDE
+     *  the WebView's cookie jar (so Set-Cookie lands where the site can read it). */
+    loadBootstrapHtml(opts: { baseUrl: string; html: string; allowedHosts: string[]; paymentHosts: string[] }): Promise<void>;
     close(): Promise<void>;
     goBack(): Promise<{ navigated: boolean }>;
     /** Hard-wipes WebView cookies + Web storage + current WebView cache/history/formData.
@@ -97,4 +102,121 @@ export async function webViewGoBack(): Promise<boolean> {
  */
 export async function clearTrackWebViewStorage(): Promise<void> {
     try { await EngnovaWebView.clearData(); } catch { /* web preview / plugin missing */ }
+}
+
+// ══ Authenticated open — the handoff ═════════════════════════════════════
+// Two different mechanisms because the two tracks have different auth
+// libraries:
+//   • CEFR is a Vite SPA using client-side supabase-js + localStorage. Tokens
+//     can travel in the URL fragment (# never leaves the client), the site's
+//     main.tsx bootstrap consumes them via supabase.auth.setSession() BEFORE
+//     React mounts, then strips the fragment.
+//   • IELTS is Next.js 15 App Router using @supabase/ssr with httpOnly cookies.
+//     A URL fragment cannot write httpOnly cookies — the server must set them.
+//     We load a tiny bootstrap HTML into the WebView (via loadDataWithBaseURL
+//     so the fetch is same-origin) that POSTs the tokens to
+//     /api/auth/native-session; the API route calls supabase.auth.setSession
+//     which writes the cookies inline in the same round-trip.
+
+async function refreshedTokens(track: Track): Promise<{ access_token: string; refresh_token: string } | null> {
+    try {
+        const client = getSupabase(track);
+        const { data } = await client.auth.getSession();
+        if (!data.session) return null;
+        // Refresh proactively when <60 s left — otherwise the site sees a 401
+        // on its first authenticated fetch and the user thinks the app broke.
+        if (data.session.expires_at && data.session.expires_at * 1000 - Date.now() < 60_000) {
+            const r = await client.auth.refreshSession({ refresh_token: data.session.refresh_token });
+            if (r.data.session) {
+                return { access_token: r.data.session.access_token, refresh_token: r.data.session.refresh_token };
+            }
+        }
+        return { access_token: data.session.access_token, refresh_token: data.session.refresh_token };
+    } catch (e) {
+        if (e instanceof TrackNotConfiguredError) return null;
+        return null;
+    }
+}
+
+/**
+ * Open the chosen track's live site WITH the native app's Supabase session
+ * pre-injected. Falls back to a plain open when no session is available or
+ * the token refresh fails — the user just sees the site's own login instead
+ * of an error. Wires progress/error/urlBlocked listeners identically to
+ * openTrackWebView.
+ */
+export async function openTrackWebViewAuthed(track: Track, cb: TrackWebViewCallbacks = {}): Promise<() => Promise<void>> {
+    const def = TRACKS[track];
+    const tokens = await refreshedTokens(track);
+
+    // No live session → fall through to unauthed open. The user will hit the
+    // site's own login inside the webview; not ideal but never a broken state.
+    if (!tokens) return openTrackWebView(track, cb);
+
+    const handles: PluginListenerHandle[] = [];
+    if (cb.onProgress)   handles.push(await EngnovaWebView.addListener('progress',   (e) => cb.onProgress!(e.value)));
+    if (cb.onError)      handles.push(await EngnovaWebView.addListener('error',      cb.onError));
+    if (cb.onUrlBlocked) handles.push(await EngnovaWebView.addListener('urlBlocked', cb.onUrlBlocked));
+
+    if (track === 'cefr') {
+        // URL-fragment handoff. main.tsx's bootstrap() consumes and strips it.
+        const at = encodeURIComponent(tokens.access_token);
+        const rt = encodeURIComponent(tokens.refresh_token);
+        // Include a benign 'eng_v=1' marker so the site can add analytics
+        // for how many opens are Engnova-authed vs cold web.
+        const url = `${def.url}/#eng_v=1&eng_at=${at}&eng_rt=${rt}`;
+        await EngnovaWebView.open({
+            url,
+            allowedHosts: def.allowedHosts,
+            paymentHosts: def.paymentHosts,
+        });
+    } else {
+        // IELTS: POST-inside-webview bootstrap. loadDataWithBaseURL runs the
+        // page as if served from ieltslevel.uz so /api/auth/native-session is
+        // same-origin and cookies land in the right jar.
+        const html = buildIeltsBootstrapHtml(tokens.access_token, tokens.refresh_token, '/en/dashboard');
+        await EngnovaWebView.loadBootstrapHtml({
+            baseUrl: def.url + '/',   // trailing slash — some webview versions insist on it
+            html,
+            allowedHosts: def.allowedHosts,
+            paymentHosts: def.paymentHosts,
+        });
+    }
+
+    return async () => {
+        for (const h of handles) { try { await h.remove(); } catch { /* noop */ } }
+        try { await EngnovaWebView.close(); } catch { /* already gone */ }
+    };
+}
+
+/**
+ * IELTS bootstrap page. POSTs tokens to /api/auth/native-session (which sets
+ * cookies via @supabase/ssr's server client), then navigates to `next`.
+ * On error, navigates to /en/login as a graceful fallback — the user sees
+ * the site's login and can re-enter credentials.
+ *
+ * Keep this HTML small and self-contained — it flashes for ~200ms during
+ * the round-trip. A dark background matching the shell splash bg avoids
+ * a white flash. Language-agnostic; the destination path picks the site's
+ * own locale flow.
+ */
+function buildIeltsBootstrapHtml(accessToken: string, refreshToken: string, next: string): string {
+    // JSON.stringify handles any special chars in the tokens safely.
+    const body = JSON.stringify({ access_token: accessToken, refresh_token: refreshToken });
+    // Escape close-script tags to prevent HTML parser from ending our script early.
+    const safeBody = body.replace(/<\/script>/gi, '<\\/script>');
+    return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Engnova</title><style>html,body{margin:0;height:100%;background:#08080C;color:#EDEFF6;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center}.d{opacity:.65;font-size:13px;letter-spacing:.06em}</style></head><body><div class="d">Ochilmoqda…</div><script>
+(async function(){
+  try {
+    const r = await fetch('/api/auth/native-session', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', 'X-Engnova-Client': '1' },
+      body: ${JSON.stringify(safeBody)}
+    });
+    if (r.ok) { location.replace(${JSON.stringify(next)}); return; }
+  } catch (e) {}
+  location.replace('/en/login');
+})();
+</script></body></html>`;
 }

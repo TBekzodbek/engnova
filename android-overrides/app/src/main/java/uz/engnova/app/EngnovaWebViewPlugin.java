@@ -96,6 +96,38 @@ public class EngnovaWebViewPlugin extends Plugin {
         });
     }
 
+    /**
+     * Load an inline HTML bootstrap into the WebView using a real https://
+     * baseUrl — required by the IELTS handoff, where a tiny bootstrap page
+     * needs to POST tokens to /api/auth/native-session FROM INSIDE the
+     * WebView's cookie jar (so the server can Set-Cookie back into that
+     * same jar). A plain fetch() from the native side would set cookies in
+     * the app's OkHttp jar and the WebView would still see a logged-out
+     * session.
+     *
+     * The `html` argument runs as if served from `baseUrl` — same-origin
+     * XHR against the site's own /api routes works, cookies flow correctly.
+     * After the bootstrap POST resolves, the bootstrap JS sets
+     * location.href to the destination path so the user lands on their
+     * dashboard already authenticated.
+     */
+    @PluginMethod
+    public void loadBootstrapHtml(final PluginCall call) {
+        final String baseUrl = call.getString("baseUrl");
+        final String html    = call.getString("html");
+        if (baseUrl == null || html == null) { call.reject("baseUrl and html required"); return; }
+        parseHosts(call);
+        getActivity().runOnUiThread(() -> {
+            closeInternal();
+            trackView = createTrackWebView();
+            // loadDataWithBaseURL treats `html` as if served from `baseUrl`,
+            // so relative fetches like fetch('/api/auth/native-session') go
+            // to the right origin and cookies persist into that origin's jar.
+            trackView.loadDataWithBaseURL(baseUrl, html, "text/html", "utf-8", null);
+            call.resolve();
+        });
+    }
+
     @PluginMethod
     public void close(final PluginCall call) {
         getActivity().runOnUiThread(() -> {
