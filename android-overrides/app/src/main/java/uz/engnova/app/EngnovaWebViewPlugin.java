@@ -3,6 +3,7 @@ package uz.engnova.app;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
@@ -32,6 +33,7 @@ import org.json.JSONException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * EngnovaWebView — the native shell's own WebView, hosting a track's live site
@@ -63,6 +65,23 @@ public class EngnovaWebViewPlugin extends Plugin {
     // Request code for the RECORD_AUDIO OS prompt. MainActivity forwards
     // onRequestPermissionsResult here via the static reference below.
     private static final int MIC_REQ_CODE = 4711;
+
+    /**
+     * Detects a webview navigation TO the site's own /login page. Matches
+     *   https://cefracademy.uz/login[?…]
+     *   https://ieltslevel.uz/login[?…]
+     *   https://ieltslevel.uz/en/login[?…]  (Next.js locale-prefixed)
+     *   https://ieltslevel.uz/ru/login[?…]
+     * On match we fire 'webLogoutDetected' — App.tsx decides whether to
+     * act (only if currently in Phase.product). Deliberately fired via
+     * onPageStarted so we catch programmatic redirects (location.replace
+     * from a logout button) that shouldOverrideUrlLoading can miss.
+     * We do NOT intercept the navigation — the site renders /login as
+     * normal so a stray visit doesn't loop the user out.
+     */
+    private static final Pattern LOGIN_URL_RE = Pattern.compile(
+        "^https://(cefracademy\\.uz|ieltslevel\\.uz)(/[a-z]{2})?/login(?:$|[/?#])"
+    );
 
     // MainActivity keeps this reference so it can route onRequestPermissionsResult
     // back into the plugin — the WebChromeClient callback that starts the request
@@ -260,6 +279,20 @@ public class EngnovaWebViewPlugin extends Plugin {
         });
 
         wv.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                // Detect the site's own /login page as a "user just logged
+                // out on the web side" signal. App.tsx correlates this with
+                // current phase and syncs the native side (clears the boot
+                // hint, invalidates the SDK session) so the two never drift.
+                if (url != null && LOGIN_URL_RE.matcher(url).find()) {
+                    JSObject e = new JSObject();
+                    e.put("url", url);
+                    notifyListeners("webLogoutDetected", e);
+                }
+                super.onPageStarted(view, url, favicon);
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();

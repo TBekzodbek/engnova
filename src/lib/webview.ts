@@ -35,6 +35,11 @@ export interface EngnovaWebViewPlugin {
     addListener(event: 'progress',   cb: (e: { value: number }) => void): Promise<PluginListenerHandle>;
     addListener(event: 'error',      cb: (e: { code: number; description: string; url: string }) => void): Promise<PluginListenerHandle>;
     addListener(event: 'urlBlocked', cb: (e: { url: string; reason: 'payment' | 'external' }) => void): Promise<PluginListenerHandle>;
+    /** Fired when the WebView navigates to the site's own /login page — the
+     *  signal that the user just logged out on the WEB side. App.tsx uses
+     *  this to sync the native side (clear the boot hint, invalidate the SDK
+     *  session) so the two never drift. */
+    addListener(event: 'webLogoutDetected', cb: (e: { url: string }) => void): Promise<PluginListenerHandle>;
 }
 
 // registerPlugin returns a stub on web; native platforms wire up the real one.
@@ -102,6 +107,20 @@ export async function webViewGoBack(): Promise<boolean> {
  */
 export async function clearTrackWebViewStorage(): Promise<void> {
     try { await EngnovaWebView.clearData(); } catch { /* web preview / plugin missing */ }
+}
+
+/**
+ * Subscribe to the "user logged out on the site" signal. Fires on any
+ * webview navigation to /login on either track's site. Web-preview stub
+ * never fires. Returns a cleanup that removes the listener.
+ */
+export async function onWebLogoutDetected(cb: (e: { url: string }) => void): Promise<() => void> {
+    try {
+        const h = await EngnovaWebView.addListener('webLogoutDetected', cb);
+        return () => { try { h.remove(); } catch { /* noop */ } };
+    } catch {
+        return () => { /* nothing to unsubscribe */ };
+    }
 }
 
 // ══ Authenticated open — the handoff ═════════════════════════════════════
