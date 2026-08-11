@@ -9,8 +9,8 @@ Category: **Education**
 Everything upstream of Play Console is assumed done:
 - Upload keystore generated + backed up (see release-build path, Ticket 1)
 - Signed AAB built via `npm run build:aab` → `android/app/build/outputs/bundle/release/app-release.aab`
-- 512 PNG icon exportable via `npm run icon:export` → `store-assets/icon-512.png`
-- Feature graphic SVG in `store-assets/feature-graphic.svg` (rasterize to 1024x500 PNG before upload)
+- 512 PNG icon + 1024×500 feature graphic exportable via `npm run graphics:export` → `store-assets/{icon-512,feature-graphic}.png`
+- Feature graphic PNG already rasterized at `store-assets/feature-graphic.png` (1024×500, no alpha, 115 KB) — re-run `npm run graphics:export` if the source SVG changes
 - Store listing copy drafted in `store-assets/store-listing.md`
 - Data Safety declarations drafted in `store-assets/data-safety-form.md`
 - Privacy policy drafted in `store-assets/privacy-policy.md`
@@ -60,7 +60,7 @@ Play surfaces a task checklist on the app dashboard. You will complete every tas
   - [ ] Russian
   - [ ] English
 - [ ] App icon → upload `store-assets/icon-512.png` (512x512, 32-bit PNG with alpha, <1 MB)
-- [ ] Feature graphic → rasterize `store-assets/feature-graphic.svg` to 1024x500 PNG, upload (required, cannot be transparent)
+- [ ] Feature graphic → upload `store-assets/feature-graphic.png` (already 1024×500, no alpha, spec-compliant)
 - [ ] Phone screenshots — 2 to 8 per locale, 16:9 or 9:16, 320–3840 px per side. Upload from:
   - [ ] `store-assets/screenshots/uz/` (2–8 files)
   - [ ] `store-assets/screenshots/ru/` (2–8 files)
