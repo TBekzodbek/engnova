@@ -115,8 +115,17 @@ That spawns `keytool` and walks you through:
 2. **Certificate identity** — Name / Org / City / Country (any real-ish
    values; Play doesn't verify them).
 3. **Key password** — press Enter to reuse the keystore password.
+4. **One more password prompt** so the script can extract the cert SHA-256
+   and auto-inject it into both `store-assets/assetlinks-*.json` files.
 
-Output: `android/engnova-upload.jks` (gitignored via `*.jks` + `android/`).
+Outputs (all gitignored via `*.jks` + `android/`):
+
+- `android/engnova-upload.jks` — the keystore itself
+- `android/engnova-upload.jks.sha256.txt` — file integrity checksum
+  (verify a backup later with `Get-FileHash` / `sha256sum`)
+- `store-assets/assetlinks-{cefracademy,ieltslevel}.public.json` — App Links
+  files with the real SHA-256 already substituted AND the `/* */` header
+  stripped, ready to drop into each site's `/.well-known/`.
 
 Then copy the tracked template and fill in your passwords:
 

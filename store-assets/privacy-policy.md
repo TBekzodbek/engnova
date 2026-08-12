@@ -1,6 +1,8 @@
 # Engnova Privacy Policy
 
 **Effective date:** 2026-08-11
+**Canonical URL:** https://cefracademy.uz/engnova-privacy.html
+**Source-of-truth HTML:** `store-assets/privacy-policy.html` (mirrored into `D:\cefrprep\public\engnova-privacy.html`; edits here need to be re-copied + pushed to cefrprep for the live page to update)
 
 ## 1. Who we are
 

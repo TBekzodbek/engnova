@@ -24,9 +24,10 @@ Everything upstream of Play Console is assumed done:
 - [ ] Google account has 2FA enabled (Play requires it for publishers)
 - [ ] Developer identity verification submitted (Play now requires ID + address for new personal-account developers — this can take up to 48 h to clear before you can publish)
 - [ ] Merchant profile — **SKIP**. Free app with no in-app billing. Uzbekistan's paycom.uz / click.uz do not go through Google Play Billing and are declared as external.
-- [ ] Privacy policy published at a stable, public HTTPS URL (paste the final URL below when you have it):
-      URL: `________________________________________`
-      Constraint: must be reachable without login, must mention "Engnova" by name, must list every data type declared in Data Safety.
+- [x] Privacy policy published at a stable, public HTTPS URL:
+      URL: **https://cefracademy.uz/engnova-privacy.html**
+      Shipped 2026-08-12 via cefrprep commit `01433ed` — Vercel auto-deploys the static file from `D:\cefrprep\public\engnova-privacy.html`. Content lives in the engnova repo at `store-assets/privacy-policy.html`; edits there → re-copy → cefrprep push.
+      Verify: `curl -sI https://cefracademy.uz/engnova-privacy.html` — expect HTTP/2 200 + `Content-Type: text/html`.
 
 ---
 
@@ -72,7 +73,7 @@ Play surfaces a task checklist on the app dashboard. You will complete every tas
 - [ ] Category (in the sidebar):
   - [ ] App category: **Education**
 - [ ] Contact details:
-  - [ ] Email: `________________________________` (required; must be a mailbox you monitor — this is where Play sends rejection notices)
+  - [x] Email: **engnovaapp@gmail.com** (mailbox already used across all owner-facing artifacts — Play sends rejection notices here)
   - [ ] Phone: `________________________________` (optional; leave blank if you don't want it public)
   - [ ] Website: `https://engnova.uz` (or whichever landing you're using)
 - [ ] External marketing → **OFF** (Play may promote us organically without pre-launch marketing consent)
@@ -133,8 +134,8 @@ Answer YES / NO honestly — the entries below are what Engnova should truthfull
 
 Tapping a `https://cefracademy.uz/*` or `https://ieltslevel.uz/*` link on a device with Engnova installed should open the app, not the browser. The manifest already declares the `autoVerify="true"` intent filters and `MainActivity.handleDeepLink` writes `engnova.track` + `engnova.pendingDeepLink` into localStorage on both cold- and warm-start. Verification is gated on both domains publishing a matching `assetlinks.json`.
 
-- [ ] Publish `assetlinks.json` at `https://cefracademy.uz/.well-known/assetlinks.json` — copy from `store-assets/assetlinks-cefracademy.json`, replacing `<REPLACE_WITH_UPLOAD_KEY_SHA256>` with the app-signing SHA-256 fingerprint (see comment header in that file). Strip the header comment; the served file must be valid JSON.
-- [ ] Publish `assetlinks.json` at `https://ieltslevel.uz/.well-known/assetlinks.json` — copy from `store-assets/assetlinks-ieltslevel.json`, same fingerprint as the cefracademy file (same app, same key).
+- [ ] Publish `assetlinks.json` at `https://cefracademy.uz/.well-known/assetlinks.json`. After `npm run keystore:generate` runs (it auto-injects the SHA-256 and writes a header-stripped, valid-JSON companion), copy `store-assets/assetlinks-cefracademy.public.json` to `D:/cefrprep/public/.well-known/assetlinks.json` and `git push` — Vercel serves it within ~30 s.
+- [ ] Publish `assetlinks.json` at `https://ieltslevel.uz/.well-known/assetlinks.json` — same flow with `store-assets/assetlinks-ieltslevel.public.json` → `D:/ieltslevel/repo/public/.well-known/assetlinks.json`.
 - [ ] Sanity-check that both URLs return HTTP 200 with `Content-Type: application/json` and no redirects — `curl -sI https://cefracademy.uz/.well-known/assetlinks.json` and same for ieltslevel. A 301 to `www.` or an HTML 404 page will silently fail verification.
 - [ ] After a signed build is on device: run `adb shell pm get-app-links uz.engnova.app` — expect **`verified`** next to `cefracademy.uz`, `www.cefracademy.uz`, `ieltslevel.uz`, and `www.ieltslevel.uz`. `1024 (verification pending)` means retry after a minute; `legacy_failure` means fingerprint mismatch.
 - [ ] Play Console → Release → **App links** (under Setup): should show a green check for both domains after the next production release is live. Errors here per-host are why the manifest keeps one `<intent-filter>` per top-level host — a mistake on one domain doesn't hide behind a pass on the other.
