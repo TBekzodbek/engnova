@@ -1,0 +1,130 @@
+/*
+ * Spine — vertical amber column, left edge of every onboarding screen.
+ * See Spine.tsx header for the design rationale.
+ */
+
+.spine {
+    position: absolute;
+    left: 0;
+    top:  0;
+    bottom: 0;
+    /* narrower on small phones, wider on larger — the dots stay left-aligned */
+    width: clamp(20px, 6vw, 28px);
+    padding: calc(var(--safe-top, 0px) + 32px) 0
+             calc(var(--safe-bottom, 0px) + 32px);
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* The amber fill column — behind the dots. Height driven by --spine-fill-pct.
+   Uses a soft top-to-bottom gradient so the "current" position feels like a
+   glow, not a hard cut. */
+.spine-fill {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--safe-bottom, 0px) + 32px);
+    transform: translateX(-50%);
+    width: 2px;
+    height: calc(100% - var(--safe-top, 0px) - var(--safe-bottom, 0px) - 64px);
+    /* Clip the visible portion to the completed % so it feels like it fills
+       BOTTOM-UP as the user progresses (the direction people read progress
+       in a vertical line — think "growing plant"). */
+    clip-path: inset(calc(100% - var(--spine-fill-pct)) 0 0 0);
+    background: linear-gradient(
+        to top,
+        var(--onb-spine)    0%,
+        var(--onb-spine)    75%,
+        var(--onb-spine-soft) 100%
+    );
+    box-shadow: var(--onb-spine-glow);
+    border-radius: 2px;
+    transition: clip-path var(--onb-t-slow) var(--onb-ease);
+}
+
+/* Faint continuation line above the fill — so the future feels "waiting to
+   be earned" rather than empty. Very low opacity. */
+.spine::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top:    calc(var(--safe-top, 0px) + 32px);
+    bottom: calc(var(--safe-bottom, 0px) + 32px);
+    transform: translateX(-50%);
+    width: 1px;
+    background: var(--onb-line);
+    border-radius: 1px;
+}
+
+.spine-dots {
+    position: relative;
+    z-index: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.spine-dot {
+    position: relative;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    /* Muted default. Past/current variants override. */
+    background: var(--onb-muted);
+    opacity: 0.5;
+    transition:
+        background var(--onb-t-base) var(--onb-ease),
+        opacity    var(--onb-t-base) var(--onb-ease),
+        transform  var(--onb-t-base) var(--onb-ease),
+        box-shadow var(--onb-t-base) var(--onb-ease);
+}
+
+.spine-dot-past {
+    background: var(--onb-spine);
+    opacity: 1;
+}
+
+.spine-dot-current {
+    background: var(--onb-ink);
+    opacity: 1;
+    transform: scale(1.6);
+    box-shadow:
+        0 0 0 3px var(--onb-spine-soft),
+        var(--onb-spine-glow);
+}
+
+.spine-dot-future {
+    /* keep default */
+}
+
+/* Labels only render on S7+ (labeled=true) — CEFR bands aligned to dots. */
+.spine-dot-label {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--onb-muted);
+    /* the "here band" gets amber emphasis */
+    transition: color var(--onb-t-base) var(--onb-ease);
+    pointer-events: none;
+}
+
+.spine-dot-here .spine-dot-label {
+    color: var(--onb-spine);
+    font-weight: 700;
+}
+
+.spine-dot-here {
+    background: var(--onb-spine);
+    opacity: 1;
+    transform: scale(2);
+    box-shadow:
+        0 0 0 4px var(--onb-spine-soft),
+        var(--onb-spine-glow);
+}

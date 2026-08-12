@@ -31,9 +31,10 @@ import { logout as authLogout } from './lib/authFlow';
 import { onWebLogoutDetected, onUrlBlocked } from './lib/webview';
 import ChooserScreen from './screens/ChooserScreen';
 import LoginScreen from './screens/LoginScreen';
-import OnboardingScreen from './screens/OnboardingScreen';
+import OnboardingFlow from './onboarding/OnboardingFlow';
 import ProductScreen from './products/ProductScreen';
 import SplashCover from './components/SplashCover';
+import { setOnboardingDone } from './lib/authState';
 
 type Phase =
     | { kind: 'booting' }
@@ -156,7 +157,20 @@ export default function App() {
         };
     }, []);
 
-    const finishOnboarding = () => setPhase({ kind: 'chooser' });
+    // Legacy 3-slide onboarding used to route to chooser. The new
+    // 10-question OnboardingFlow already knows the user's track from S3+S8,
+    // so it hands us the picked track directly and we route to login.
+    const finishOnboardingWithTrack = async (t: Track) => {
+        saveTrack(t);
+        await setOnboardingDone(true);
+        setPhase({ kind: 'login', track: t });
+    };
+    // Escape hatch — S2 "Skip" bails to the cold chooser so users who
+    // don't want the guided flow can still self-pick.
+    const skipOnboarding = async () => {
+        await setOnboardingDone(true);
+        setPhase({ kind: 'chooser' });
+    };
 
     const choose = (t: Track) => { saveTrack(t); setPhase({ kind: 'login', track: t }); };
 
@@ -172,7 +186,9 @@ export default function App() {
 
     // ── Render ─────────────────────────────────────────────────────────────
     if (phase.kind === 'booting')    return <SplashCover />;
-    if (phase.kind === 'onboarding') return <OnboardingScreen onDone={finishOnboarding} />;
+    if (phase.kind === 'onboarding') return (
+        <OnboardingFlow onDone={finishOnboardingWithTrack} onSkip={skipOnboarding} />
+    );
     if (phase.kind === 'chooser')    return <ChooserScreen onChoose={choose} />;
 
     if (phase.kind === 'login') {
