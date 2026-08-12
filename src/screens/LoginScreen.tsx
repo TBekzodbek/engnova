@@ -17,6 +17,7 @@ import { TRACKS, type Track } from '../lib/tracks';
 import { useI18n } from '../i18n';
 import { getSupabase, isTrackConfigured } from '../lib/supabaseClients';
 import { mapAuthError } from '../lib/mapAuthError';
+import { isGoogleSignInAvailable, signInWithGoogle } from '../lib/googleAuth';
 import LanguageChip from '../components/LanguageChip';
 import './LoginScreen.css';
 
@@ -49,6 +50,11 @@ export default function LoginScreen({ track, onSuccess, onBack }: Props) {
     const [showPw,   setShowPw]   = useState(false);
     const [busy,     setBusy]     = useState(false);
     const [errKey,   setErrKey]   = useState<string | null>(null);
+    // Google button only renders when the plugin is registered AND a Web
+    // Client ID was baked into the build. On dev preview / older APKs /
+    // owner-not-yet-configured builds, the button stays hidden so users
+    // never see a broken affordance.
+    const googleReady = isGoogleSignInAvailable();
 
     const tintStyle: CSSProperties = {
         '--track-shell':      def.tint.shell,
@@ -122,6 +128,35 @@ export default function LoginScreen({ track, onSuccess, onBack }: Props) {
         }
     }
 
+    async function handleGoogleSignIn() {
+        if (busy) return;
+        setErrKey(null);
+        setBusy(true);
+        try {
+            const { idToken } = await signInWithGoogle();
+            const client = getSupabase(track);
+            // signInWithIdToken verifies the token against Supabase's
+            // configured Google provider — the Web Client ID in Google
+            // Cloud must match the one this app used to obtain the token.
+            const { error } = await client.auth.signInWithIdToken({ provider: 'google', token: idToken });
+            if (error) {
+                const m = mapAuthError(error);
+                setErrKey(m.i18nKey);
+                setBusy(false);
+                return;
+            }
+            const { setAuthHint } = await import('../lib/authState');
+            await setAuthHint(track, true);
+            onSuccess();
+        } catch (err) {
+            // Plugin throws on cancel + on any provider error — either way,
+            // map to a friendly i18n line and stop the spinner.
+            const m = mapAuthError(err);
+            setErrKey(m.i18nKey === 'auth.err.unknown' ? 'login.google.error' : m.i18nKey);
+            setBusy(false);
+        }
+    }
+
     return (
         <div className="login" style={tintStyle}>
             <header className="login-topbar">
@@ -134,13 +169,52 @@ export default function LoginScreen({ track, onSuccess, onBack }: Props) {
             <div className="login-body">
                 <h1 className="login-headline">{t('login.headline', { trackName })}</h1>
 
-                {/* Persistent Google-user banner — a lot of registered users signed
-                    up with Google and have NO password. Without this they'd try
-                    their (nonexistent) password, get "invalid credentials",
-                    and bounce. */}
-                <div className="login-banner" role="note">
-                    {t('login.google.banner')}
-                </div>
+                {/* When the native Google plugin is available (native platform +
+                    Web Client ID configured), lead with the "Continue with
+                    Google" button + a divider — this is the primary path for
+                    the ~30% of cefracademy users who signed up via Google.
+                    Below the divider is the classic email/password form for
+                    everyone else. */}
+                {googleReady && (
+                    <>
+                        <button
+                            type="button"
+                            className="login-btn login-btn-google"
+                            onClick={handleGoogleSignIn}
+                            disabled={busy}
+                            aria-label={t('login.google.button')}
+                        >
+                            {busy ? (
+                                <Loader2 size={16} className="login-spin" aria-hidden="true" />
+                            ) : (
+                                <span className="login-google-mark" aria-hidden="true">
+                                    {/* Google G mark — inline SVG so no external asset */}
+                                    <svg viewBox="0 0 48 48" width="18" height="18">
+                                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.7 1.22 9.18 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                                    </svg>
+                                </span>
+                            )}
+                            <span>{t('login.google.button')}</span>
+                        </button>
+                        <div className="login-divider" aria-hidden="true">
+                            <span>{t('login.divider.or')}</span>
+                        </div>
+                    </>
+                )}
+
+                {/* Persistent Google-user banner — shown ONLY when the native
+                    Google button is NOT available (dev preview, old APK,
+                    owner hasn't finished Google Cloud setup). Tells those
+                    users to use the forgot-password fallback. Once the
+                    button ships, this banner disappears automatically. */}
+                {!googleReady && (
+                    <div className="login-banner" role="note">
+                        {t('login.google.banner')}
+                    </div>
+                )}
 
                 <form className="login-form" onSubmit={handleSubmit} noValidate>
                     <label className="login-field">
@@ -151,8 +225,14 @@ export default function LoginScreen({ track, onSuccess, onBack }: Props) {
                             autoComplete="email"
                             inputMode="email"
                             required
+                            /* Xiaomi/MIUI keyboards aggressively title-case
+                               the first letter of any input. Emails are
+                               case-sensitive on some servers — disable it. */
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                            spellCheck="false"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => setEmail(e.target.value.trim())}
                             placeholder={t('login.email.placeholder')}
                             disabled={busy}
                         />
@@ -167,6 +247,14 @@ export default function LoginScreen({ track, onSuccess, onBack }: Props) {
                                 autoComplete="current-password"
                                 required
                                 minLength={1}
+                                /* Passwords MUST bypass every keyboard hint —
+                                   Xiaomi's Gboard has been observed to auto-
+                                   capitalize / auto-correct password characters
+                                   even when the field type is password. This
+                                   used to silently break login on Redmi. */
+                                autoCapitalize="none"
+                                autoCorrect="off"
+                                spellCheck="false"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 disabled={busy}

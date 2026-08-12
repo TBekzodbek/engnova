@@ -23,6 +23,7 @@
     "@capacitor/browser": "^8.0.4",
     "@capacitor/core": "^8.5.0",
     "@capacitor/preferences": "^8.0.1",
+    "@capgo/capacitor-social-login": "^8.4.0",
     "@supabase/supabase-js": "^2.105.4",
     "lucide-react": "^1.14.0",
     "react": "^19.2.6",

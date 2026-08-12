@@ -18,6 +18,12 @@ const config: CapacitorConfig = {
       androidSplashResourceName: 'ic_splash',
       showSpinner: false,
     },
+    // Google Sign-In is provided by @capgo/capacitor-social-login and
+    // configured at runtime via SocialLogin.initialize({ google: {...} })
+    // in src/lib/googleAuth.ts. The Web Client ID comes from the
+    // VITE_GOOGLE_WEB_CLIENT_ID env var at build time — see
+    // store-assets/google-signin-setup.md for the Google Cloud + Supabase
+    // provisioning walkthrough.
   },
 };
 
