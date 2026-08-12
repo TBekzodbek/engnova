@@ -138,6 +138,25 @@ export async function onWebLogoutDetected(cb: (e: { url: string }) => void): Pro
     }
 }
 
+/**
+ * Subscribe to the "URL was routed OUT of the WebView" signal — fires when
+ * the plugin bounces a payment / external URL to a Chrome Custom Tab or the
+ * system browser. App.tsx uses this + the document visibilitychange event
+ * to decide whether returning users should be re-routed to LoginScreen
+ * (payment case: yes; external link case: no — see App.tsx handler).
+ * Web-preview stub never fires. Returns cleanup.
+ */
+export async function onUrlBlocked(
+    cb: (e: { url: string; reason: 'payment' | 'external' }) => void,
+): Promise<() => void> {
+    try {
+        const h = await EngnovaWebView.addListener('urlBlocked', cb);
+        return () => { try { h.remove(); } catch { /* noop */ } };
+    } catch {
+        return () => { /* nothing to unsubscribe */ };
+    }
+}
+
 // ══ Authenticated open — the handoff ═════════════════════════════════════
 // Two different mechanisms because the two tracks have different auth
 // libraries:

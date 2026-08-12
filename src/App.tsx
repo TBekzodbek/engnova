@@ -28,7 +28,7 @@ import { getSavedTrack, saveTrack, clearTrack, type Track } from './lib/tracks';
 import { getSupabase, isTrackConfigured } from './lib/supabaseClients';
 import { getAuthHint, getOnboardingDone, setAuthHint } from './lib/authState';
 import { logout as authLogout } from './lib/authFlow';
-import { onWebLogoutDetected } from './lib/webview';
+import { onWebLogoutDetected, onUrlBlocked } from './lib/webview';
 import ChooserScreen from './screens/ChooserScreen';
 import LoginScreen from './screens/LoginScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
@@ -110,6 +110,50 @@ export default function App() {
             })();
         }).then((c) => { cleanup = c; });
         return () => { cleanup?.(); };
+    }, []);
+
+    // ── "Went to website, came back → show login" flow ────────────────────
+    // When the user is in Product and the native plugin bounces a URL to a
+    // Chrome Custom Tab (payment → paycom.uz/click.uz, or a /pricing hit),
+    // record when it happened. On the next foreground event (Custom Tab
+    // closed, app resumed) we route to LoginScreen so the site re-fetches
+    // fresh session/premium state after the user's excursion.
+    //
+    // reason='external' (some random third-party link) is IGNORED — those
+    // didn't touch auth or entitlements, no reason to yank the user out of
+    // their WebView state.
+    //
+    // We deliberately do NOT call authLogout here — the Supabase session
+    // stays valid, LoginScreen's next successful sign-in returns them to
+    // Product with a freshly-loaded WebView (which sees the new premium
+    // state / freshly-created account / whatever changed on the site).
+    const externalNavAt = useRef<number | null>(null);
+    useEffect(() => {
+        let cleanup: (() => void) | null = null;
+        onUrlBlocked((e) => {
+            if (e.reason === 'payment') externalNavAt.current = Date.now();
+        }).then((c) => { cleanup = c; });
+        return () => { cleanup?.(); };
+    }, []);
+    useEffect(() => {
+        const RECENT_MS = 5 * 60 * 1000;   // 5 min covers Payme/Click checkout end-to-end
+        const onVis = () => {
+            if (document.visibilityState !== 'visible') return;
+            const cur = phaseRef.current;
+            if (cur.kind !== 'product') return;
+            const at = externalNavAt.current;
+            if (at == null || Date.now() - at > RECENT_MS) return;
+            externalNavAt.current = null;
+            setPhase({ kind: 'login', track: cur.track });
+        };
+        document.addEventListener('visibilitychange', onVis);
+        // Some Android WebViews don't reliably fire visibilitychange on the
+        // Chrome Custom Tab close path — window.focus is a redundant safety net.
+        window.addEventListener('focus', onVis);
+        return () => {
+            document.removeEventListener('visibilitychange', onVis);
+            window.removeEventListener('focus', onVis);
+        };
     }, []);
 
     const finishOnboarding = () => setPhase({ kind: 'chooser' });

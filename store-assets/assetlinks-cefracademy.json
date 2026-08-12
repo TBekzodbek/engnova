@@ -13,7 +13,7 @@
  *
  * BEFORE UPLOADING:
  *
- *   1. Replace <REPLACE_WITH_UPLOAD_KEY_SHA256> below with your upload
+ *   1. Replace 1E:E5:98:0B:AB:64:22:CA:E4:C5:82:86:5E:C8:B7:7F:CC:BF:51:25:99:4A:17:22:B1:82:49:79:A5:3A:FE:67 below with your upload
  *      key's SHA-256 fingerprint. Get it from your local keystore:
  *
  *        keytool -list -v \
@@ -55,7 +55,7 @@
     "target": {
       "namespace": "android_app",
       "package_name": "uz.engnova.app",
-      "sha256_cert_fingerprints": ["<REPLACE_WITH_UPLOAD_KEY_SHA256>"]
+      "sha256_cert_fingerprints": ["1E:E5:98:0B:AB:64:22:CA:E4:C5:82:86:5E:C8:B7:7F:CC:BF:51:25:99:4A:17:22:B1:82:49:79:A5:3A:FE:67"]
     }
   }
 ]

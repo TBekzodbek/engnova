@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "uz.engnova.app",
+      "sha256_cert_fingerprints": ["1E:E5:98:0B:AB:64:22:CA:E4:C5:82:86:5E:C8:B7:7F:CC:BF:51:25:99:4A:17:22:B1:82:49:79:A5:3A:FE:67"]
+    }
+  }
+]
