@@ -1,0 +1,30 @@
+<!--
+  Engnova mark — the primary icon.
+
+  Concept: a serif "E" for Eng-, followed by a small amber "•" for -nova.
+  The E carries the word; the dot carries the spark (nova = a sudden point of
+  brightness, but rendered as punctuation, not a literal star — per owner call).
+  Together the mark reads "E•" which is the visual grammar we already use in the
+  app's wordmark header, now compressed into a single icon-friendly form.
+
+  Palette matches the app: warm dark navy ground (#0C0A1A), amber signature
+  (#FFB86B). Rounded corner radius (rx=112) matches Android adaptive icon +
+  iOS icon templates without the launcher clipping the mark.
+
+  Georgia is used for the serif — universally available on every OS that will
+  rasterize this file (Windows/macOS/iOS/Android/most Linux). If a build later
+  needs a font-independent version, replace the <text> with a hand-drawn path.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Engnova">
+  <rect width="512" height="512" rx="112" ry="112" fill="#0C0A1A"/>
+  <text
+    x="222" y="384"
+    font-family="Georgia, 'Times New Roman', 'PT Serif', 'DejaVu Serif', serif"
+    font-size="440"
+    font-weight="500"
+    text-anchor="middle"
+    fill="#FFB86B"
+    letter-spacing="-0.02em"
+  >E</text>
+  <circle cx="392" cy="368" r="30" fill="#FFB86B"/>
+</svg>
