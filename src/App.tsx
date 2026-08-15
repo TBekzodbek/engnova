@@ -1,212 +1,142 @@
 /**
- * Engnova shell — top-level phase machine.
+ * Engnova shell — top-level phase machine (v2, 2026-08-13 pivot).
+ *
+ * Engnova is now a STANDALONE product with its own auth backend
+ * (getEngnovaSupabase). Cefracademy / ieltslevel accounts CANNOT sign in
+ * here — those two sites become potential content sources, not auth
+ * partners. See lib/supabaseEngnova.ts for the rationale.
  *
  *   Phase =
- *     'booting'       bootRoute() resolving — SplashCover masks this
- *     'onboarding'    first-run, no saved track — 3-slide intro
- *     'chooser'       user hasn't picked a track (or tapped Switch)
- *     'login'         track picked, no valid session
- *     'product'       valid session — webview open with auth handoff
+ *     'booting'      bootRoute() resolving — SplashCover masks this
+ *     'welcome'      first frame: brand + one-line + "Let's begin"
+ *     'login'        EngnovaLoginScreen (Google / Telegram / Email)
+ *     'signup'       EngnovaSignupScreen (email path)
+ *     'setpw'        EngnovaSetPasswordScreen (post-OAuth gate)
+ *     'home'         EngnovaHomeScreen (placeholder for the real product)
  *
- * bootRoute() is a fast, network-free decision:
- *   1. If a track is saved → skip onboarding (returning user, they've seen it).
- *   2. If NO saved track AND onboarding-done pref not set → onboarding.
- *   3. If NO saved track AND pref set → chooser.
- *   4. Saved track:
- *        - not configured (IELTS placeholder) → login (renders coming-soon state)
- *        - hint says logged in AND SDK has in-memory session → product
- *        - anything else → login
+ * bootRoute() decides on cold start:
+ *   1. If Engnova auth is not configured → welcome (shows "server not
+ *      connected" once on login; harmless).
+ *   2. If we have a hint that the user is signed in AND the SDK confirms
+ *      an active session → home.
+ *   3. Otherwise → welcome.
  *
- * Web-logout sync: the plugin fires 'webLogoutDetected' when the webview
- * navigates to the site's /login page (user clicked Log out on the site).
- * We correlate with current phase — only trigger native logout if we're
- * actually in Product; a stray /login visit before login shouldn't do
- * anything.
+ * The old two-track flow (chooser → per-track login → webview product) is
+ * retained in the codebase (ChooserScreen, LoginScreen, ProductScreen)
+ * for the day we want to open cefracademy / ielts inside Engnova as
+ * content, but it no longer runs at boot.
  */
 import { useEffect, useRef, useState } from 'react';
-import { getSavedTrack, saveTrack, clearTrack, type Track } from './lib/tracks';
-import { getSupabase, isTrackConfigured } from './lib/supabaseClients';
-import { getAuthHint, getOnboardingDone, setAuthHint } from './lib/authState';
-import { logout as authLogout } from './lib/authFlow';
-import { onWebLogoutDetected, onUrlBlocked } from './lib/webview';
-import ChooserScreen from './screens/ChooserScreen';
-import LoginScreen from './screens/LoginScreen';
-import OnboardingFlow from './onboarding/OnboardingFlow';
-import ProductScreen from './products/ProductScreen';
-import SplashCover from './components/SplashCover';
-import { setOnboardingDone } from './lib/authState';
+import EngnovaWelcomeScreen     from './screens/EngnovaWelcomeScreen';
+import EngnovaLoginScreen       from './screens/EngnovaLoginScreen';
+import EngnovaSignupScreen      from './screens/EngnovaSignupScreen';
+import EngnovaSetPasswordScreen from './screens/EngnovaSetPasswordScreen';
+import EngnovaHomeScreen        from './screens/EngnovaHomeScreen';
+import SplashCover              from './components/SplashCover';
+import { getEngnovaSupabase, isEngnovaConfigured } from './lib/supabaseEngnova';
+import { getEngnovaAuthHint, setEngnovaAuthHint } from './lib/authState';
 
 type Phase =
     | { kind: 'booting' }
-    | { kind: 'onboarding' }
-    | { kind: 'chooser' }
-    | { kind: 'login';   track: Track }
-    | { kind: 'product'; track: Track };
+    | { kind: 'welcome' }
+    | { kind: 'login' }
+    | { kind: 'signup' }
+    | { kind: 'setpw';   email: string | null }
+    | { kind: 'home' };
 
 /**
- * Fast path: known track + known-good session → product.
- * Any error → login (safest — user proves they're still real).
+ * Fast path: known-good Engnova session → home.
+ * Anything else → welcome (the user re-authenticates through the door).
  */
 async function bootRoute(): Promise<Phase> {
-    const track = getSavedTrack();
-
-    // First-time users see onboarding before the chooser. Returning users
-    // (saved track present) skip straight through.
-    if (!track) {
-        const done = await getOnboardingDone();
-        return { kind: done ? 'chooser' : 'onboarding' };
-    }
-
-    // Track picked but its Supabase creds aren't set (IELTS placeholder in dev):
-    // show the login screen so the user sees the "coming soon" state, not a
-    // broken auto-login attempt.
-    if (!isTrackConfigured(track)) return { kind: 'login', track };
-
-    const hint = await getAuthHint();
-    if (!hint[track]) return { kind: 'login', track };
-
-    // Confirm the SDK actually has a live session. In-memory + local storage
-    // read — no network. Rare failure modes fall through to login.
+    if (!isEngnovaConfigured()) return { kind: 'welcome' };
+    const hint = await getEngnovaAuthHint();
+    if (!hint) return { kind: 'welcome' };
     try {
-        const client = getSupabase(track);
+        const client = getEngnovaSupabase();
         const { data } = await client.auth.getSession();
-        if (data.session) return { kind: 'product', track };
-        // Hint said yes, SDK says no — clear the hint so we don't flip-flop.
-        await setAuthHint(track, false);
-        return { kind: 'login', track };
+        if (data.session) return { kind: 'home' };
+        // Hint said yes, SDK says no — clear the hint so we don't flip-flop
+        // on future boots.
+        await setEngnovaAuthHint(false);
+        return { kind: 'welcome' };
     } catch {
-        return { kind: 'login', track };
+        return { kind: 'welcome' };
     }
 }
 
 export default function App() {
     const [phase, setPhase] = useState<Phase>({ kind: 'booting' });
-    // Kept in sync so the web-logout listener (registered once on mount) always
-    // reads the CURRENT phase, not the one captured at listener-register time.
     const phaseRef = useRef(phase);
     useEffect(() => { phaseRef.current = phase; }, [phase]);
 
-    // Boot on mount. The SplashCover renders until this resolves so users
-    // never see the wrong intermediate frame.
+    // Boot on mount. SplashCover renders until bootRoute resolves so the
+    // user never sees a wrong intermediate frame.
     useEffect(() => {
         let cancelled = false;
         bootRoute().then((p) => { if (!cancelled) setPhase(p); });
         return () => { cancelled = true; };
     }, []);
 
-    // Web-side logout detection. When the WebView navigates to the site's
-    // /login (user clicked Log out inside the webview), sync the native side.
-    // Registered ONCE on mount; unsubscribes on unmount.
-    useEffect(() => {
-        let cleanup: (() => void) | null = null;
-        onWebLogoutDetected(() => {
-            const cur = phaseRef.current;
-            if (cur.kind !== 'product') return;      // stray /login navigation before login — ignore
-            // Match the shape of handleLogout below so the two paths behave identically.
-            const track = cur.track;
-            setPhase({ kind: 'booting' });
-            void (async () => {
-                await authLogout(track);
-                setPhase({ kind: 'login', track });
-            })();
-        }).then((c) => { cleanup = c; });
-        return () => { cleanup?.(); };
-    }, []);
+    // ── Render ──────────────────────────────────────────────────────────
+    if (phase.kind === 'booting') return <SplashCover />;
 
-    // ── "Went to website, came back → show login" flow ────────────────────
-    // When the user is in Product and the native plugin bounces a URL to a
-    // Chrome Custom Tab (payment → paycom.uz/click.uz, or a /pricing hit),
-    // record when it happened. On the next foreground event (Custom Tab
-    // closed, app resumed) we route to LoginScreen so the site re-fetches
-    // fresh session/premium state after the user's excursion.
-    //
-    // reason='external' (some random third-party link) is IGNORED — those
-    // didn't touch auth or entitlements, no reason to yank the user out of
-    // their WebView state.
-    //
-    // We deliberately do NOT call authLogout here — the Supabase session
-    // stays valid, LoginScreen's next successful sign-in returns them to
-    // Product with a freshly-loaded WebView (which sees the new premium
-    // state / freshly-created account / whatever changed on the site).
-    const externalNavAt = useRef<number | null>(null);
-    useEffect(() => {
-        let cleanup: (() => void) | null = null;
-        onUrlBlocked((e) => {
-            if (e.reason === 'payment') externalNavAt.current = Date.now();
-        }).then((c) => { cleanup = c; });
-        return () => { cleanup?.(); };
-    }, []);
-    useEffect(() => {
-        const RECENT_MS = 5 * 60 * 1000;   // 5 min covers Payme/Click checkout end-to-end
-        const onVis = () => {
-            if (document.visibilityState !== 'visible') return;
-            const cur = phaseRef.current;
-            if (cur.kind !== 'product') return;
-            const at = externalNavAt.current;
-            if (at == null || Date.now() - at > RECENT_MS) return;
-            externalNavAt.current = null;
-            setPhase({ kind: 'login', track: cur.track });
-        };
-        document.addEventListener('visibilitychange', onVis);
-        // Some Android WebViews don't reliably fire visibilitychange on the
-        // Chrome Custom Tab close path — window.focus is a redundant safety net.
-        window.addEventListener('focus', onVis);
-        return () => {
-            document.removeEventListener('visibilitychange', onVis);
-            window.removeEventListener('focus', onVis);
-        };
-    }, []);
-
-    // Legacy 3-slide onboarding used to route to chooser. The new
-    // 10-question OnboardingFlow already knows the user's track from S3+S8,
-    // so it hands us the picked track directly and we route to login.
-    const finishOnboardingWithTrack = async (t: Track) => {
-        saveTrack(t);
-        await setOnboardingDone(true);
-        setPhase({ kind: 'login', track: t });
-    };
-    // Escape hatch — S2 "Skip" bails to the cold chooser so users who
-    // don't want the guided flow can still self-pick.
-    const skipOnboarding = async () => {
-        await setOnboardingDone(true);
-        setPhase({ kind: 'chooser' });
-    };
-
-    const choose = (t: Track) => { saveTrack(t); setPhase({ kind: 'login', track: t }); };
-
-    const back = () => { clearTrack(); setPhase({ kind: 'chooser' }); };
-
-    const loginSuccess = (t: Track) => setPhase({ kind: 'product', track: t });
-
-    const handleLogout = async (t: Track) => {
-        setPhase({ kind: 'booting' });
-        await authLogout(t);
-        setPhase({ kind: 'login', track: t });
-    };
-
-    // ── Render ─────────────────────────────────────────────────────────────
-    if (phase.kind === 'booting')    return <SplashCover />;
-    if (phase.kind === 'onboarding') return (
-        <OnboardingFlow onDone={finishOnboardingWithTrack} onSkip={skipOnboarding} />
-    );
-    if (phase.kind === 'chooser')    return <ChooserScreen onChoose={choose} />;
+    if (phase.kind === 'welcome') {
+        return <EngnovaWelcomeScreen onStart={() => setPhase({ kind: 'login' })} />;
+    }
 
     if (phase.kind === 'login') {
         return (
-            <LoginScreen
-                track={phase.track}
-                onSuccess={() => loginSuccess(phase.track)}
-                onBack={back}
+            <EngnovaLoginScreen
+                onSuccess={async ({ needsPassword, email }) => {
+                    await setEngnovaAuthHint(true);
+                    setPhase(needsPassword ? { kind: 'setpw', email } : { kind: 'home' });
+                }}
+                onWantSignup={() => setPhase({ kind: 'signup' })}
             />
         );
     }
 
-    // product
+    if (phase.kind === 'signup') {
+        return (
+            <EngnovaSignupScreen
+                onSuccess={async ({ sessionCreated, email }) => {
+                    if (sessionCreated) {
+                        // Auto-confirm was on OR the user was already
+                        // verified — hint the session and drop into
+                        // password-set (they already have one from signup,
+                        // so straight to home).
+                        await setEngnovaAuthHint(true);
+                        setPhase({ kind: 'home' });
+                    } else {
+                        // Email confirmation pending — bounce to login with
+                        // a helpful message (user must confirm email first).
+                        // Fall back to login so they can try after confirming.
+                        void email; // captured for future prefill
+                        setPhase({ kind: 'login' });
+                    }
+                }}
+                onBack={() => setPhase({ kind: 'login' })}
+            />
+        );
+    }
+
+    if (phase.kind === 'setpw') {
+        return (
+            <EngnovaSetPasswordScreen
+                email={phase.email}
+                onDone={() => setPhase({ kind: 'home' })}
+            />
+        );
+    }
+
+    // home
     return (
-        <ProductScreen
-            track={phase.track}
-            onSwitchTrack={back}
-            onLogout={() => handleLogout(phase.track)}
+        <EngnovaHomeScreen
+            onSignOut={async () => {
+                await setEngnovaAuthHint(false);
+                setPhase({ kind: 'welcome' });
+            }}
         />
     );
 }

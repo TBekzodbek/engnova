@@ -25,6 +25,7 @@ import type { Track } from './tracks';
 
 const HINT_KEY = 'engnova.authHint.v1';
 const ONBOARD_KEY = 'engnova.onboardingDone.v1';
+const ENGNOVA_AUTH_KEY = 'engnova.selfAuth.v1';
 
 export interface AuthHint {
     cefr:  boolean;
@@ -76,5 +77,26 @@ export async function setOnboardingDone(done: boolean): Promise<void> {
     try {
         if (done) await Preferences.set({ key: ONBOARD_KEY, value: '1' });
         else      await Preferences.remove({ key: ONBOARD_KEY });
+    } catch { /* ignore */ }
+}
+
+// ── Engnova self-auth hint ───────────────────────────────────────────────────
+// Separate from the per-track hint above. Tells bootRoute whether the user
+// has an active Engnova session so we can skip Welcome → Login on relaunch.
+// Set true after successful sign-in / signup; cleared on sign-out.
+
+export async function getEngnovaAuthHint(): Promise<boolean> {
+    try {
+        const { value } = await Preferences.get({ key: ENGNOVA_AUTH_KEY });
+        return value === '1';
+    } catch {
+        return false;
+    }
+}
+
+export async function setEngnovaAuthHint(loggedIn: boolean): Promise<void> {
+    try {
+        if (loggedIn) await Preferences.set({ key: ENGNOVA_AUTH_KEY, value: '1' });
+        else          await Preferences.remove({ key: ENGNOVA_AUTH_KEY });
     } catch { /* ignore */ }
 }

@@ -1,0 +1,244 @@
+/*
+ * EngnovaLoginScreen — mentor-notebook palette, warm-dark navy ground with
+ * the amber signature used sparingly (only on the primary CTA + inline
+ * accents). Matches the onboarding identity so the flow feels continuous.
+ */
+
+.eng-login {
+    min-height: 100dvh;
+    padding:
+        calc(env(safe-area-inset-top,    0) + 12px)
+        calc(env(safe-area-inset-right,  0) + 20px)
+        calc(env(safe-area-inset-bottom, 0) + 20px)
+        calc(env(safe-area-inset-left,   0) + 20px);
+    background: #0C0A1A;
+    color: #F0EEE6;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 480px;
+    margin: 0 auto;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.eng-login-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+}
+
+.eng-login-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 20px;
+}
+
+.eng-login-headline {
+    margin: 0 0 4px;
+    font-size: 28px;
+    line-height: 1.18;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    color: #F0EEE6;
+}
+
+.eng-login-support {
+    margin: 0 0 12px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: rgba(240, 238, 230, 0.72);
+    text-wrap: pretty;
+    max-width: 34ch;
+}
+
+.eng-login-notready {
+    padding: 10px 12px;
+    background: rgba(255, 184, 107, 0.10);
+    border: 1px solid rgba(255, 184, 107, 0.28);
+    border-radius: 12px;
+    color: #FFB86B;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 4px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+
+.eng-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 52px;
+    padding: 0 20px;
+    border-radius: 14px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition:
+        background 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        filter 160ms cubic-bezier(0.22, 1, 0.36, 1);
+    box-sizing: border-box;
+}
+.eng-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.eng-btn:active:not(:disabled) { transform: scale(0.98); }
+
+.eng-btn-primary {
+    background: #FFB86B;
+    color: #0C0A1A;
+    border-color: #FFB86B;
+    box-shadow: 0 0 24px rgba(255, 184, 107, 0.35);
+    margin-top: 4px;
+}
+.eng-btn-primary:hover:not(:disabled) { filter: brightness(1.05); }
+.eng-btn-primary:disabled {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(240, 238, 230, 0.4);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
+    opacity: 1;
+}
+
+.eng-btn-google {
+    background: #FFFFFF;
+    color: #1F1F1F;
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.eng-btn-google:hover:not(:disabled) { background: #F8F9FA; }
+.eng-google-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.eng-btn-telegram {
+    background: #229ED9;
+    color: #FFFFFF;
+    border-color: #229ED9;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.eng-btn-telegram:hover:not(:disabled) { background: #1E8EC6; }
+
+/* ── Divider ─────────────────────────────────────────────────────────── */
+
+.eng-divider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0 4px;
+    color: rgba(240, 238, 230, 0.55);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.eng-divider::before,
+.eng-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(240, 238, 230, 0.12);
+}
+
+/* ── Form ────────────────────────────────────────────────────────────── */
+
+.eng-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.eng-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(240, 238, 230, 0.12);
+    border-radius: 12px;
+    color: #F0EEE6;
+    font: 500 15px/1.4 inherit;
+    outline: none;
+    transition: border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow   160ms cubic-bezier(0.22, 1, 0.36, 1);
+    box-sizing: border-box;
+}
+.eng-input::placeholder { color: rgba(240, 238, 230, 0.42); }
+.eng-input:focus {
+    border-color: #FFB86B;
+    box-shadow: 0 0 0 3px rgba(255, 184, 107, 0.24);
+}
+.eng-input:disabled { opacity: 0.55; }
+
+.eng-input-wrap {
+    position: relative;
+}
+.eng-eye {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 8px;
+    color: rgba(240, 238, 230, 0.55);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.eng-eye:hover { color: #F0EEE6; }
+
+.eng-error {
+    font-size: 13px;
+    line-height: 1.45;
+    color: #F87171;
+    margin-top: 2px;
+    text-wrap: pretty;
+}
+
+/* ── Signup row ──────────────────────────────────────────────────────── */
+
+.eng-signup-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 13.5px;
+}
+.eng-signup-text {
+    color: rgba(240, 238, 230, 0.55);
+}
+.eng-link {
+    background: transparent;
+    border: none;
+    padding: 6px 4px;
+    color: #FFB86B;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 160ms;
+}
+.eng-link:hover { opacity: 0.85; }
+
+/* ── Spinner ─────────────────────────────────────────────────────────── */
+
+.eng-spin { animation: eng-spin 0.9s linear infinite; }
+@keyframes eng-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .eng-btn, .eng-input { transition-duration: 0ms; }
+    .eng-spin { animation-duration: 0ms; }
+}
