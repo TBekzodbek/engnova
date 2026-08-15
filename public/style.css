@@ -1,0 +1,185 @@
+/*
+ * engnova.uz — public site (landing + legal pages).
+ *
+ * Palette mirrors the app: warm dark navy ground, warm cream ink, one amber
+ * signature accent. Serif for the wordmark only (Georgia fallback since we
+ * don't load webfonts on this tiny static site).
+ */
+
+:root {
+  --bg:         #0C0A1A;              /* warm dark navy — matches app */
+  --surface:    #16132B;              /* one step lifted */
+  --surface-hi: #211D3B;              /* two steps lifted */
+  --border:     rgba(240,238,230,0.10);
+  --border-hi:  rgba(240,238,230,0.18);
+  --ink:        #F0EEE6;              /* warm cream — matches app */
+  --ink-soft:   rgba(240,238,230,0.78);
+  --muted:      #837CA0;              /* lavender-gray */
+  --faint:      rgba(240,238,230,0.42);
+  --amber:      #FFB86B;              /* signature */
+  --amber-soft: rgba(255,184,107,0.16);
+  --amber-glow: 0 0 24px rgba(255,184,107,0.35);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+a { color: var(--amber); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── Brand wordmark ─────────────────────────────────────────────────── */
+
+.brand-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0 0 0.6rem;
+}
+.brand {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', 'PT Serif', serif;
+  font-size: 2.4rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1;
+}
+.brand-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: var(--amber-glow);
+  vertical-align: middle;
+  margin-bottom: 0.35rem;
+}
+
+.tagline {
+  color: var(--ink-soft);
+  margin: 0 0 2rem;
+  font-size: 1.05rem;
+  text-wrap: pretty;
+  max-width: 40ch;
+}
+
+/* ── Doc pages (privacy / terms / account-deletion) ─────────────────── */
+
+h1.doc-title {
+  font-size: 1.7rem;
+  margin: 0.5rem 0 0.35rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.updated {
+  color: var(--faint);
+  font-size: 0.85rem;
+  margin: 0 0 2rem;
+}
+h2 {
+  font-size: 1.1rem;
+  margin: 2rem 0 0.5rem;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+p, li { color: var(--ink-soft); text-wrap: pretty; }
+p a, li a { color: var(--amber); }
+
+ul { padding-left: 1.25rem; }
+li { margin-bottom: 0.4rem; }
+
+.back {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.back:hover { color: var(--ink); }
+
+/* ── Landing cards ──────────────────────────────────────────────────── */
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 12px;
+  background: var(--amber);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: var(--amber-glow);
+  margin-top: 0.5rem;
+  transition: filter 160ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cta:hover { filter: brightness(1.05); text-decoration: none; }
+.cta:active { transform: scale(0.98); }
+.cta-quiet {
+  display: inline-block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-left: 1rem;
+}
+.cta-quiet:hover { color: var(--ink); }
+
+.features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  margin: 2.5rem 0;
+}
+@media (min-width: 560px) { .features { grid-template-columns: 1fr 1fr; } }
+
+.feature {
+  padding: 1.2rem;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.feature h3 {
+  margin: 0 0 0.35rem;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.feature p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
+
+/* ── Footer ─────────────────────────────────────────────────────────── */
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.footer-links a { color: var(--muted); }
+.footer-links a:hover { color: var(--ink); }
+
+footer {
+  color: var(--faint);
+  font-size: 0.82rem;
+  margin-top: 3rem;
+  line-height: 1.55;
+}
+footer a { color: var(--faint); }
+footer a:hover { color: var(--ink); }

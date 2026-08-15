@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "buildCommand": "echo \"static-only — Capacitor app is not deployed to web\"",
+  "outputDirectory": "public",
+  "installCommand": "echo \"skip install — no npm build needed for static site\"",
+  "framework": null,
+  "trailingSlash": false
+}
