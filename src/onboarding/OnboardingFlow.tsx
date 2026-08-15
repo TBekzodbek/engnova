@@ -37,13 +37,18 @@ import S7Verdict    from './screens/S7Verdict';
 import S8Track      from './screens/S8Track';
 import S9Social     from './screens/S9Social';
 import S10Commitment from './screens/S10Commitment';
+import S11Register from './screens/S11Register';
+import S12Paywall  from './screens/S12Paywall';
 import './tokens.css';
 import './screens/shared.css';
 
 interface OnboardingFlowProps {
-    /** Called when S10 finishes with the confirmed track — App.tsx should
-     *  save it, mark onboarding done, and route to LoginScreen(track). */
-    onDone: (track: Track) => void;
+    /** Called when S12 finishes with the confirmed track. `sessionCreated`
+     *  is true when S11 minted a live Supabase session (Google path, or the
+     *  rare case email-verification is off); false when the user registered
+     *  via email and must confirm before signing in — App routes to Login
+     *  in that case, or directly to Product when true. */
+    onDone: (track: Track, sessionCreated: boolean) => void;
     /** Called if user hits Skip on S2 — App.tsx sends them to the chooser
      *  (preserves the current "just let me pick a track" escape hatch). */
     onSkip: () => void;
@@ -161,19 +166,43 @@ export default function OnboardingFlow({ onDone, onSkip }: OnboardingFlowProps) 
     if (step === 9) {
         return <S9Social onNext={() => goTo(10)} onBack={() => goTo(8)} />;
     }
-    // ── S10 Commitment (final) ──────────────────────────────────────────
+    // ── S10 Commitment ──────────────────────────────────────────────────
     if (step === 10) {
         return (
             <S10Commitment
                 value={answers.commitment}
                 onChange={(c: Commitment) => update({ commitment: c })}
-                onDone={() => {
-                    // Must have S8's track by now — fall back to CEFR if the
-                    // user somehow resumed straight into S10 without S8.
-                    const track = answers.track ?? 'cefr';
-                    onDone(track);
-                }}
+                onDone={() => goTo(11)}
                 onBack={() => goTo(9)}
+            />
+        );
+    }
+    // ── S11 Register ────────────────────────────────────────────────────
+    if (step === 11) {
+        // Must have S8's track by now — fall back to CEFR if the user
+        // somehow resumed straight into S11 without S8.
+        const track = answers.track ?? 'cefr';
+        return (
+            <S11Register
+                track={track}
+                verdict={answers.verdict}
+                onNext={(email, sessionCreated) => {
+                    update({ email, registered: sessionCreated });
+                    goTo(12);
+                }}
+                onBack={() => goTo(10)}
+            />
+        );
+    }
+    // ── S12 Native Paywall (final) ──────────────────────────────────────
+    if (step === 12) {
+        const track = answers.track ?? 'cefr';
+        return (
+            <S12Paywall
+                verdict={answers.verdict}
+                commitment={answers.commitment}
+                onDone={() => onDone(track, !!answers.registered)}
+                onBack={() => goTo(11)}
             />
         );
     }

@@ -50,6 +50,12 @@ export interface OnboardingAnswers {
     /** Confirmed track from S8 (recommendation, or explicit override). */
     track?:      Track;
     commitment?: Commitment;
+    /** Email captured on S11 — set for BOTH Google and email paths. */
+    email?:      string;
+    /** True once S11 created a real Supabase session (Google path, or email
+     *  path when email-verification is off). False/absent means the user is
+     *  registered but must confirm email before they can sign in. */
+    registered?: boolean;
 }
 
 const KEY = 'engnova.onboarding.answers.v1';
@@ -113,5 +119,9 @@ export function firstIncompleteStep(a: OnboardingAnswers): number {
     if (a.track      == null) return 8;   // S8: track confirmation
     // S9 (social proof) has no answer — always skippable in resume flow
     if (a.commitment == null) return 10;  // S10: commitment
-    return 11;   // done — proceed to login
+    // S11 (register) sets email + registered. If neither is set the user has
+    // not yet reached S11; if email is set but not registered, they went the
+    // email-verification path and are past S11 — either way S12 is next.
+    if (a.email == null && !a.registered) return 11;
+    return 12;   // S12 paywall — visual only, tap-through to app
 }

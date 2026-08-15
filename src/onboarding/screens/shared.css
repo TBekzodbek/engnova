@@ -84,3 +84,254 @@
     border-left: 3px solid var(--onb-spine);
     box-shadow: -8px 0 24px -12px rgba(255, 184, 107, 0.24);
 }
+
+/*
+ * ── S11 Register ─────────────────────────────────────────────────────────
+ * Google button reuses .onb-btn-primary (amber fill). Email fields are
+ * GHOST inputs — transparent bg + hairline border — so they read as "still
+ * the notebook", not the main app breaking in.
+ */
+.onb-eyebrow-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.onb-verdict-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    background: transparent;
+    border: 1px solid var(--onb-spine);
+    border-radius: var(--onb-radius-pill);
+    color: var(--onb-spine);
+    font-size: 12px;
+    letter-spacing: -0.01em;
+}
+
+.onb-btn-google {
+    padding-left: 14px;
+    padding-right: 20px;
+}
+.onb-google-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: #fff;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.onb-divider {
+    position: relative;
+    text-align: center;
+    margin: 6px 0 4px;
+    color: var(--onb-muted);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+}
+.onb-divider::before,
+.onb-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 52px);
+    height: 1px;
+    background: var(--onb-line);
+}
+.onb-divider::before { left: 0; }
+.onb-divider::after  { right: 0; }
+
+.onb-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 6px;
+}
+.onb-ghost-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: transparent;
+    border: 1px solid var(--onb-line);
+    border-radius: var(--onb-radius);
+    color: var(--onb-ink);
+    font: 500 15px/1.4 var(--onb-font-body);
+    outline: none;
+    transition:
+        border-color var(--onb-t-fast) var(--onb-ease),
+        box-shadow   var(--onb-t-fast) var(--onb-ease);
+    box-sizing: border-box;
+}
+.onb-ghost-input::placeholder { color: var(--onb-muted); }
+.onb-ghost-input:focus {
+    border-color: var(--onb-spine);
+    box-shadow: 0 0 0 3px var(--onb-spine-soft);
+}
+.onb-ghost-input:disabled { opacity: 0.6; }
+
+.onb-inline-error {
+    font-size: 13px;
+    line-height: 1.45;
+    color: #F87171;
+}
+.onb-inline-note {
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--onb-spine);
+}
+.onb-terms {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--onb-muted);
+    text-wrap: pretty;
+}
+.onb-spin { animation: onb-spin 0.9s linear infinite; }
+@keyframes onb-spin { to { transform: rotate(360deg); } }
+
+/*
+ * ── S12 Native Paywall ───────────────────────────────────────────────────
+ * Amber returns for one final ceremonial appearance in onboarding: the
+ * hero-scale verdict recap. After this screen, amber rests until the mock
+ * verdict badge post-login.
+ */
+.onb-s12-hero {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 8px 0 8px;
+    flex-wrap: wrap;
+}
+.onb-s12-hero-you {
+    font-size: 16px;
+    color: var(--onb-ink-soft);
+    letter-spacing: -0.005em;
+}
+.onb-s12-hero-band {
+    font-size: 44px;
+    color: var(--onb-ink);
+    line-height: 1;
+    position: relative;
+    font-variant-numeric: tabular-nums;
+}
+.onb-s12-hero-band::after {
+    content: '';
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: -6px;
+    height: 3px;
+    background: var(--onb-spine);
+    opacity: 0.55;
+    border-radius: 2px;
+}
+.onb-s12-hero-arrow {
+    font-size: 22px;
+    color: var(--onb-muted);
+    line-height: 1;
+}
+
+.onb-s12-tiers {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 2px;
+}
+.onb-s12-tier {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 10px;
+    min-height: 92px;
+    background: var(--onb-paper);
+    border: 1px solid var(--onb-line);
+    border-radius: var(--onb-radius);
+    text-align: center;
+    position: relative;
+}
+.onb-s12-tier-recommended {
+    border-color: var(--onb-spine);
+    box-shadow: inset 0 0 0 1px var(--onb-spine);
+}
+.onb-s12-tier-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--onb-ink);
+}
+.onb-s12-tier-desc {
+    font-size: 11.5px;
+    color: var(--onb-muted);
+    line-height: 1.35;
+}
+.onb-s12-tier-badge {
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--onb-spine);
+    color: var(--onb-ground);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: var(--onb-radius-pill);
+    letter-spacing: 0.02em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.onb-inoculation {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--onb-paper-hi);
+    border: 1px solid var(--onb-line-hi);
+    border-radius: var(--onb-radius);
+    align-items: flex-start;
+    margin: 4px 0;
+}
+.onb-inoculation-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--onb-ground);
+    background: var(--onb-spine);
+    border-radius: 50%;
+    font-family: var(--onb-font-display);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    margin-top: 1px;
+}
+.onb-inoculation-text {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--onb-ink);
+    text-wrap: pretty;
+}
+.onb-inoculation-text strong {
+    font-weight: 700;
+    color: var(--onb-ink);
+    letter-spacing: 0.01em;
+}
+
+.onb-link-quiet {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--onb-muted);
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+.onb-link-quiet:hover { color: var(--onb-ink-soft); }
+
+.onb-s12-footer {
+    margin-top: 4px;
+    text-align: center;
+}

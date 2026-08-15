@@ -315,3 +315,51 @@
     padding-top: var(--space-xl);
     max-width: 32ch;
 }
+
+/*
+ * ── Invalid-credentials actionable card ──────────────────────────────────
+ * Replaces the plain error line when Supabase returns invalid_credentials.
+ * Names the most common cause (user signed up via Google — no password
+ * exists) and offers one-tap recovery: the Google button + a reset link.
+ * Fixes the "type + retype + gave up" loop.
+ */
+.login-invalid-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.28);
+    border-radius: var(--radius-md, 12px);
+    margin: 6px 0 4px;
+}
+.login-invalid-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #F87171;
+    letter-spacing: -0.005em;
+}
+.login-invalid-card-body {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-ink);
+    opacity: 0.86;
+}
+.login-invalid-card-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+.login-btn-compact {
+    min-height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+    width: auto;
+    margin-top: 0;
+}
+.login-invalid-reset {
+    align-self: center;
+    padding: 6px 4px;
+}
