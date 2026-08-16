@@ -75,10 +75,12 @@ export default function EngnovaLoginScreen({ onSuccess, onWantSignup }: Props) {
             }
             if (!session) { setErrKey('engnova.auth.err.tg.timeout'); setTgBusy(false); return; }
             const client = getEngnovaSupabase();
+            // `session.token` is the `hashed_token` from admin.generateLink({type:'magiclink'})
+            // — verify with type:'magiclink' + token_hash. The hash identifies the user;
+            // supabase-js's token-hash overload does not accept `email`.
             const { error } = await client.auth.verifyOtp({
-                email: session.email,
-                token: session.token,
-                type:  'email',
+                token_hash: session.token,
+                type:       'magiclink',
             });
             if (error) { setErrKey('engnova.auth.err.tg'); setTgBusy(false); return; }
             // Telegram user's phone lives in auth.users.phone (set by the

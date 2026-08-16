@@ -1,35 +1,25 @@
 /**
  * telegramAuth.ts — Telegram Login flow for Engnova.
  *
- * How it works end-to-end (documented so future-you knows what to wire):
- *
+ * End-to-end:
  *   1. User taps "Telegram bilan davom etish" in EngnovaLoginScreen.
- *   2. We open tg://resolve?domain={BOT}&start=login_{nonce} — Telegram app
- *      opens directly to the bot's start command with our nonce.
- *   3. The bot (@EngnovaAuthBot, owner-managed) responds with a Contact
- *      Request keyboard: "Share your phone number to continue".
- *   4. User taps Share. Telegram sends the phone to the bot via a Contact
- *      update. The bot POSTs { nonce, phone, tg_user_id, first_name } to
- *      our Supabase Edge Function `telegram-auth-callback`.
- *   5. The Edge Function verifies the sender IS our bot (bot token secret
- *      compare) and either:
- *        - upserts the auth.users row with phone as identifier
- *        - creates a one-time magic link via supabase.auth.admin.generateLink
- *      and stores the link keyed by nonce.
- *   6. Meanwhile the app polls a public RPC `poll_telegram_session(nonce)`
- *      every 2s; once the link exists, RPC returns it and the app calls
- *      signInWithOtp / verifyOtp to establish the Supabase session.
+ *   2. launchTelegramLogin() opens tg://resolve?domain={BOT}&start=login_{nonce}.
+ *   3. Bot receives /start login_<nonce> → Edge Function stages the nonce,
+ *      replies with Contact-request keyboard.
+ *   4. User taps Share → Edge Function receives phone, creates auth.users
+ *      row, generates a magic-link token via admin.generateLink, writes
+ *      { email, token } into telegram_sessions keyed by nonce.
+ *   5. App polls public.poll_telegram_session(nonce). RPC returns a table,
+ *      so supabase-js hands back Array<{ email, token }> (0 or 1 rows).
+ *   6. App calls verifyOtp({ type:'magiclink', token_hash, email }) →
+ *      session established.
  *
- * NONE of steps 3-6 exist yet — owner must:
- *   - Create the bot with @BotFather
- *   - Deploy the Edge Function (`supabase/functions/telegram-auth-callback/`)
- *   - Create the poll RPC + a small `telegram_sessions` table (nonce, link,
- *     created_at, consumed_at)
- *   - Set VITE_ENGNOVA_TG_BOT_USERNAME in .env.local
+ * Server-side pieces live at:
+ *   - supabase/migrations/20260816130500_telegram_sessions.sql
+ *   - supabase/functions/telegram-auth-callback/index.ts
  *
- * Until the env var is set, isTelegramAuthAvailable() returns false and the
- * button is hidden in the login screen — the same "no broken affordances"
- * discipline we use for Google.
+ * Until VITE_ENGNOVA_TG_BOT_USERNAME is set the button stays hidden — same
+ * "no broken affordances" discipline as Google.
  */
 import { Browser } from '@capacitor/browser';
 
@@ -66,13 +56,13 @@ export function launchTelegramLogin(): { nonce: string } {
 }
 
 /**
- * Poll our Supabase RPC for a magic link keyed by this nonce. Returns null
- * until the bot has completed its side. Caller should poll every ~2s.
+ * Poll poll_telegram_session(nonce). Returns null while the bot hasn't
+ * finished; caller polls every ~2s and times out after 60s.
  *
- * WARNING: this depends on the `poll_telegram_session` RPC + Edge Function
- * being deployed. Until then it returns null forever — the login screen
- * should time out after 60s and show a "check Telegram — did you tap
- * Share?" hint.
+ * The RPC is `returns table(email text, token text)`, so supabase-js hands
+ * back `Array<{email, token}>` with 0 or 1 rows. `token` is the magic-link
+ * `hashed_token` produced by admin.generateLink server-side — pass it to
+ * verifyOtp as `token_hash`, NOT `token`.
  */
 export async function pollTelegramSession(
     getEngnovaSupabase: () => import('@supabase/supabase-js').SupabaseClient,
@@ -80,11 +70,11 @@ export async function pollTelegramSession(
 ): Promise<{ email: string; token: string } | null> {
     try {
         const client = getEngnovaSupabase();
-        // Server returns a magic-link-style email OTP the app can verify.
-        // Shape: { email: 'tg-<phone>@engnova.uz', token: 'xxxxxx' } or null.
         const { data, error } = await client.rpc('poll_telegram_session', { p_nonce: nonce });
-        if (error || !data) return null;
-        return data as { email: string; token: string };
+        if (error) return null;
+        const rows = data as Array<{ email: string; token: string }> | null;
+        if (!rows || rows.length === 0) return null;
+        return rows[0];
     } catch {
         return null;
     }
